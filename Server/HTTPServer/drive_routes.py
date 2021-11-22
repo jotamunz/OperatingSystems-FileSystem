@@ -1,5 +1,5 @@
 # Imports
-from server import app
+from HTTPServer import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
 from JSONHandler.loginHandler import createDrive, login, driveIsUnique
