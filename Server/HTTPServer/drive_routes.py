@@ -9,8 +9,9 @@ post_drive_req_schema = {
     "properties": {
         "username": {"type": "string"},
         "requestedBytes": {"type": "number"},
+        "password": {"type": "string"}
     },
-    "required": ["username", "requestedBytes"]
+    "required": ["username", "requestedBytes", "password"]
 }
 
 
