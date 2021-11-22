@@ -1,5 +1,7 @@
 from JSONHandler.loginHandler import *
+from JSONHandler.fileHandler import *
 
-print(createDrive("Roo", "123", 100))
-print(login("Roo", "123"))
+print(getDirContent("Soap/root/folder1"))
+
+
 
