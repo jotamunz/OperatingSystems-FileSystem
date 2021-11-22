@@ -8,7 +8,7 @@
           matInput
           [formControl]="loginFormControl"
           type="text"
-          [(ngModel)]="username"
+          [(ngModel)]="user.username"
         />
 
         <!-- Validations -->
@@ -18,11 +18,11 @@
 
         <!-- Clear Button -->
         <button
-          *ngIf="username"
+          *ngIf="user.username"
           matSuffix
           mat-icon-button
           aria-label="Clear"
-          (click)="username = ''"
+          (click)="user.username = ''"
         >
           <mat-icon>close</mat-icon>
         </button>
@@ -35,7 +35,7 @@
           matInput
           type="password"
           [formControl]="passwordFormControl"
-          [(ngModel)]="password"
+          [(ngModel)]="user.password"
         />
 
         <!-- Validations -->
@@ -45,11 +45,11 @@
 
         <!-- Clear Button -->
         <button
-          *ngIf="password"
+          *ngIf="user.password"
           matSuffix
           mat-icon-button
           aria-label="Clear"
-          (click)="password = ''"
+          (click)="user.password = ''"
         >
           <mat-icon>close</mat-icon>
         </button>

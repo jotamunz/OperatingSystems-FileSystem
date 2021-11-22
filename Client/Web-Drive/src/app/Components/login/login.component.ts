@@ -3,29 +3,34 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { SignUpComponent } from '../sign-up/sign-up.component';
 
+import User from '../../Models/user.model';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
-  username = '';
-  password = '';
-  loginFormControl = new FormControl('', [Validators.required]);
-  passwordFormControl = new FormControl('', [Validators.required])
-  
-  constructor(public dialog: MatDialog) { }
-
-  ngOnInit(): void {
+  public user: User = {
+    username: '',
+    password: '',
   };
 
-  openDialog() {
-    const dialogRef = this.dialog.open(SignUpComponent);
+  public loginFormControl: FormControl = new FormControl('', [
+    Validators.required,
+  ]);
+  public passwordFormControl: FormControl = new FormControl('', [
+    Validators.required,
+  ]);
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-    });
+  constructor(public dialog: MatDialog) {}
+
+  ngOnInit(): void {}
+
+  /**
+   * Opens the signup dialog
+   */
+  public openDialog(): void {
+    this.dialog.open(SignUpComponent);
   }
-
-  
 }
