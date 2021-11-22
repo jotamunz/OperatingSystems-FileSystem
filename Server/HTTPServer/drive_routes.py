@@ -2,6 +2,7 @@
 from server import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
+from JSONHandler.jsonHandler import *
 
 # Request schemas
 post_drive_req_schema = {
@@ -28,8 +29,27 @@ def post_drive():
     """
     content = request.json
     resp = {"username": content["username"], "allocatedBytes": content["requestedBytes"]}
-    if content["username"] == "Turq":
-        error = {"message": "User drive already exists"}
+    status = createDrive(content["username"], content["requestedBytes"])
+    if not status:
+        error = {"message": "Invalid username, please input another one"}
         return make_response(jsonify(error), 409)
-    print(f'A new drive of {content["requestedBytes"]} bytes was created for user {content["username"]}')
+    return make_response(jsonify(resp), 200)
+
+
+@app.route('/drives/login', methods=['POST'])
+@expects_json(post_drive_req_schema)
+def post_drive():
+    """
+    response:
+    {
+        "username": String,
+        "allocatedBytes": Number
+    }
+    """
+    content = request.json
+    resp = {"username": content["username"], "allocatedBytes": content["requestedBytes"]}
+    status = createDrive(content["username"], content["requestedBytes"])
+    if not status:
+        error = {"message": "Invalid username, please input another one"}
+        return make_response(jsonify(error), 409)
     return make_response(jsonify(resp), 200)
