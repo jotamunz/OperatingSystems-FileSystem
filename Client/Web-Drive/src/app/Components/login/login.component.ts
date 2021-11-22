@@ -33,4 +33,14 @@ export class LoginComponent implements OnInit {
   public openDialog(): void {
     this.dialog.open(SignUpComponent);
   }
+
+  /**
+   * Authenticates user with entered credentials
+   * @returns void
+   */
+  public onSignInClick(): void {
+    if (!this.user.username || !this.user.password) {
+      return;
+    }
+  }
 }

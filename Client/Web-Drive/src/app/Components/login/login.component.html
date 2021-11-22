@@ -59,7 +59,13 @@
       <div class="login-buttons">
         <a (click)="openDialog()">Register</a>
         <a href="#">Forgot Password?</a>
-        <button mat-raised-button color="primary">Sign-In</button>
+        <button
+          (click)="this.onSignInClick()"
+          mat-raised-button
+          color="primary"
+        >
+          Sign-In
+        </button>
       </div>
     </div>
   </div>
