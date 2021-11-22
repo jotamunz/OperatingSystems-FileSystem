@@ -15,6 +15,15 @@ post_drive_req_schema = {
     "required": ["username", "requestedBytes", "password"]
 }
 
+post_drive_login_req_schema = {
+    "type": "object",
+    "properties": {
+        "username": {"type": "string"},
+        "password": {"type": "string"}
+    },
+    "required": ["username", "password"]
+}
+
 
 # Routes
 @app.route('/drives', methods=['POST'])
@@ -37,19 +46,13 @@ def post_drive():
 
 
 @app.route('/drives/login', methods=['POST'])
-@expects_json(post_drive_req_schema)
-def post_drive():
+@expects_json(post_drive_login_req_schema)
+def post_drive_login():
     """
     response:
     {
-        "username": String,
-        "allocatedBytes": Number
     }
     """
     content = request.json
-    resp = {"username": content["username"], "allocatedBytes": content["requestedBytes"]}
-    status = createDrive(content["username"], content["requestedBytes"])
-    if not status:
-        error = {"message": "Invalid username, please input another one"}
-        return make_response(jsonify(error), 409)
+    resp = {"username": content["username"]}
     return make_response(jsonify(resp), 200)
