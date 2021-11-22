@@ -2,7 +2,7 @@
 from server import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-from JSONHandler.LoginHandler import createDrive, login, driveIsUnique
+from JSONHandler.loginHandler import createDrive, login, driveIsUnique
 
 # Request schemas
 post_drive_req_schema = {
