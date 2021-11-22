@@ -23,5 +23,28 @@ def readJSON(user):
         jsonObject = json.load(openfile)
     return jsonObject
 
+#E: A users username and a size in bytes
+#S: A new empty json for the user
+#D: Returns a new json drive for a user
+def newDrive(username, size):
+    jsonObject = {
+        "user": username,
+        "size": size,
+        "used": 0,
+        "root": {
+            "directories": [],
+            "files": []
+        },
+        "shared": {
+            "directories": [],
+            "files": []
+        }
+    }
+    return jsonObject
+
 def createDrive(username, size):
-    pass
+    #check for unique username
+    jsonObject = newDrive(username, size)
+    writeJSON(jsonObject)
+    return
+
