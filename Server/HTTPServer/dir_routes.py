@@ -42,6 +42,7 @@ def get_dir():
             }
             ]
         ]
+    contents is empty in case of error
     }
     """
     content = request.json
