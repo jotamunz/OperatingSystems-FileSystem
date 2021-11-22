@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {FormControl, Validators} from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { SignUpComponent } from '../sign-up/sign-up.component';
 
 @Component({
   selector: 'app-login',
@@ -9,11 +11,21 @@ import {FormControl, Validators} from '@angular/forms';
 export class LoginComponent implements OnInit {
   username = '';
   password = '';
-  constructor() { }
+  loginFormControl = new FormControl('', [Validators.required]);
+  passwordFormControl = new FormControl('', [Validators.required])
+  
+  constructor(public dialog: MatDialog) { }
 
   ngOnInit(): void {
   };
 
-  loginFormControl = new FormControl('', [Validators.required]);
-  passwordFormControl = new FormControl('', [Validators.required])
+  openDialog() {
+    const dialogRef = this.dialog.open(SignUpComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
+
+  
 }
