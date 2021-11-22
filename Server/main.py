@@ -27,7 +27,8 @@ string = '''
                         "creation": "date",
                         "modification": "date",
                         "size": 5,
-                        "path": "Roo/root/folder1/file1.txt"
+                        "path": "Roo/root/folder1/file1.txt",
+                        "content": "hello world"
                     }
                 ]
             },
@@ -45,7 +46,8 @@ string = '''
                 "creation": "date",
                 "modification": "date",
                 "size": 5,
-                "path": "Roo/root/file1.txt"
+                "path": "Roo/root/file1.txt",
+                "content": "hello world"
             },
             {
                 "name": "file2",
@@ -53,7 +55,8 @@ string = '''
                 "creation": "date",
                 "modification": "date",
                 "size": 5,
-                "path": "Roo/root/file2.txt"
+                "path": "Roo/root/file2.txt",
+                "content": "hello world"
             }
         ]
     },
@@ -75,7 +78,8 @@ string = '''
                 "creation": "date",
                 "modification": "date",
                 "size": 5,
-                "path": "Roo/shared/file1.txt"
+                "path": "Roo/shared/file1.txt",
+                "content": "hello world"
             }
         ]
     }
@@ -83,4 +87,4 @@ string = '''
 '''
 
 data = json.loads(string)
-print(data["shared"]["files"][0]["name"])
+print(data["shared"]["files"][0]["content"])
