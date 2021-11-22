@@ -1,5 +1,6 @@
 {
     "user": "Soap",
+    "password": "123",
     "size": 100,
     "used": 20,
     "root":
