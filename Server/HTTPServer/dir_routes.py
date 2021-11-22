@@ -1,23 +1,12 @@
 # Imports
 from server import app
 from flask import request, jsonify, make_response
-from flask_expects_json import expects_json
 from JSONHandler.fileHandler import getDirContent
-
-# Request schemas
-get_dir_req_schema = {
-    "type": "object",
-    "properties": {
-        "dirPath": {"type": "string"},
-    },
-    "required": ["dirPath"]
-}
 
 
 # Routes
 # Route to get a specific dir of an user
 @app.route('/dirs', methods=['GET'])
-@expects_json(get_dir_req_schema)
 def get_dir():
     """
     response:
@@ -45,6 +34,8 @@ def get_dir():
     contents is empty in case of error
     }
     """
-    content = request.json
-    resp = getDirContent(content["dirPath"])
+    dir_path = request.args.get('dirPath')
+    resp = getDirContent(dir_path)
+    if not resp:
+        return make_response(jsonify(resp), 409)
     return make_response(jsonify(resp), 200)
