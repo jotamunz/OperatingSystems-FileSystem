@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { AuthenticationService } from '../../Services/authentication/authentication.service';
 import { SignUpComponent } from '../sign-up/sign-up.component';
 
 import User from '../../Models/user.model';
@@ -23,7 +24,10 @@ export class LoginComponent implements OnInit {
     Validators.required,
   ]);
 
-  constructor(public dialog: MatDialog) {}
+  constructor(
+    private dialog: MatDialog,
+    private authenticationService: AuthenticationService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -42,5 +46,10 @@ export class LoginComponent implements OnInit {
     if (!this.user.username || !this.user.password) {
       return;
     }
+    this.authenticationService
+      .authenticateUser(this.user)
+      .subscribe((response: Object) => {
+        console.log(response);
+      });
   }
 }
