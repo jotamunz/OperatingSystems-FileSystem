@@ -1,10 +1,11 @@
 {
-    "user": "Soap",
+    "user": "Roo",
     "password": "123",
     "size": 100,
     "used": 20,
     "root":
     {
+        "name": "root",
         "directories":
         [
             {
@@ -25,7 +26,6 @@
                         "creation": "date",
                         "modification": "date",
                         "size": 5,
-                        "path": "Roo/root/folder1/file1.txt",
                         "content": "hello world"
                     }
                 ]
@@ -44,7 +44,6 @@
                 "creation": "date",
                 "modification": "date",
                 "size": 5,
-                "path": "Roo/root/file1.txt",
                 "content": "hello world"
             },
             {
@@ -53,13 +52,13 @@
                 "creation": "date",
                 "modification": "date",
                 "size": 5,
-                "path": "Roo/root/file2.txt",
                 "content": "hello world"
             }
         ]
     },
     "shared":
     {
+        "name": "shared",
         "directories":
         [
             {
@@ -76,7 +75,6 @@
                 "creation": "date",
                 "modification": "date",
                 "size": 5,
-                "path": "Roo/shared/file1.txt",
                 "content": "hello world"
             }
         ]
