@@ -1,5 +1,5 @@
 # Imports
-from server import app
+from HTTPServer import app
 from flask import request, jsonify, make_response
 from JSONHandler.fileHandler import getDirContent
 
