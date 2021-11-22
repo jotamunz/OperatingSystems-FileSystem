@@ -7,9 +7,10 @@ import { MaterialModule } from './material/material.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './Components/login/login.component';
 import { SignUpComponent } from './Components/sign-up/sign-up.component';
+import { DriveComponent } from './Components/drive/drive.component';
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, SignUpComponent],
+  declarations: [AppComponent, LoginComponent, SignUpComponent, DriveComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
