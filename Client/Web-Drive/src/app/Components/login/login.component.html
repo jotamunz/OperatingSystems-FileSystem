@@ -1,0 +1,56 @@
+<div class="container">
+  <div class="login">
+    <div class="login-input">
+      <mat-form-field class="form-field" appearance="fill">
+        <mat-label>Login</mat-label>
+        <input
+          matInput
+          [formControl]="loginFormControl"
+          type="text"
+          [(ngModel)]="username"
+        />
+        <mat-error *ngIf="loginFormControl.hasError('required')">
+          Username is <strong>required</strong>
+        </mat-error>
+        <button
+          *ngIf="username"
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="username = ''"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field class="form-field" appearance="fill">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          type="password"
+          [formControl]="passwordFormControl"
+          [(ngModel)]="password"
+        />
+        <mat-error *ngIf="passwordFormControl.hasError('required')">
+          Password is <strong>required</strong>
+        </mat-error>
+
+        <button
+          *ngIf="password"
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="password = ''"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+      <div class="login-buttons">
+        <a href="#">Register</a>
+        <a href="#">Forgot Password?</a>
+        <button mat-raised-button color="primary">Sign-In</button>
+      </div>
+    </div>
+  </div>
+  <div class="wallpaper"></div>
+</div>
