@@ -24,6 +24,9 @@ def readJSON(user):
         jsonObject = json.load(openfile)
     return jsonObject
 
+#E: A fisical directory and a file name
+#S: A boolean
+#D: Determines if a file exists in a fisical directory
 def fileExistsFisical(directory, name):
     for filename in os.listdir(directory):
         file = os.path.join(directory, filename)
@@ -34,6 +37,9 @@ def fileExistsFisical(directory, name):
                 return True
     return False
 
+#E: A file name
+#S: A boolean
+#D: Determines if a file name contains special characters
 def nameIsValid(name):
     invalidChars = set(string.punctuation.replace(" ", ""))
     return not any(char in invalidChars for char in name)
