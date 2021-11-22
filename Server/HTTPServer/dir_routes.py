@@ -2,16 +2,15 @@
 from server import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-# from JSONHandler.loginHandler import createDrive, driveIsUnique
+from JSONHandler.fileHandler import getDirContent
 
 # Request schemas
 get_dir_req_schema = {
     "type": "object",
     "properties": {
-        "username": {"type": "string"},
-        "dirPath": {"type": "number"},
+        "dirPath": {"type": "string"},
     },
-    "required": ["username", "dirPath"]
+    "required": ["dirPath"]
 }
 
 
@@ -46,5 +45,5 @@ def get_dir():
     }
     """
     content = request.json
-    resp = {"username": content["username"], "allocatedBytes": content["requestedBytes"]}
+    resp = getDirContent(content["dirPath"])
     return make_response(jsonify(resp), 200)
