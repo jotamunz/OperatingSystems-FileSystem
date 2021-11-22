@@ -2,7 +2,7 @@
 from server import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-from JSONHandler.jsonHandler import *
+from JSONHandler.LoginHandler import createDrive, login, driveIsUnique
 
 # Request schemas
 post_drive_req_schema = {
@@ -37,11 +37,17 @@ def post_drive():
     }
     """
     content = request.json
-    resp = {"username": content["username"], "allocatedBytes": content["requestedBytes"]}
-    status = createDrive(content["username"], content["requestedBytes"])
-    if not status:
-        error = {"message": "Invalid username, please input another one"}
+    if not driveIsUnique(content["username"]):
+        error = {"message": "Another drive already exists with given username"}
         return make_response(jsonify(error), 409)
+    if not type(content["requestedBytes"]) == int:
+        error = {"message": "Please enter an integer amount of bytes to allocate for the drive"}
+        return make_response(jsonify(error), 409)
+    status = createDrive(content["username"], content["password"], content["requestedBytes"])
+    if not status:
+        error = {"message": "Invalid username, please try another"}
+        return make_response(jsonify(error), 409)
+    resp = {"username": content["username"], "allocatedBytes": content["requestedBytes"]}
     return make_response(jsonify(resp), 200)
 
 
@@ -51,8 +57,13 @@ def post_drive_login():
     """
     response:
     {
+        status: boolean
     }
     """
     content = request.json
-    resp = {"username": content["username"]}
+    status = login(content["username"], content["password"])
+    if not status:
+        error = {"status": False, "message": "Invalid username or password, please try another"}
+        return make_response(jsonify(error), 409)
+    resp = {"status": True}
     return make_response(jsonify(resp), 200)

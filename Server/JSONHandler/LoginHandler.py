@@ -1,6 +1,6 @@
 from JSONHandler.jsonHandler import *
 
-def DriveIsUnique(username):
+def driveIsUnique(username):
     currentDir = os.path.dirname(__file__)
     drivesDir = os.path.join(currentDir, '..', 'Drives')
     return not fileExistsFisical(drivesDir, username)
