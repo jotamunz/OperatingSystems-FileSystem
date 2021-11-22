@@ -14,6 +14,17 @@ get_file_req_schema = {
     "required": ["username", "filepath", "filename"]
 }
 
+post_file_req_schema = {
+    "type": "object",
+    "properties": {
+        "username": {"type": "string"},
+        "filepath": {"type": "string"},
+        "filename": {"type": "string"},
+        "content": {"type": "string"}
+    },
+    "required": ["username", "filepath", "filename", "content"]
+}
+
 
 # Routes
 @app.route('/files', methods=['GET'])
@@ -29,6 +40,28 @@ def get_file():
         "size": Number,
         "path": String,
         "content": String
+    }
+    """
+    content = request.json
+    print(f'A new drive of {content["RequestedBytes"]} bytes was created for user {content["Username"]}')
+    resp = {"Username": content["Username"], "AllocatedBytes": content["RequestedBytes"]}
+    if content["Username"] == "Turq":
+        error = {"message": "User drive already exists"}
+        return make_response(jsonify(error), 409)
+    return make_response(jsonify(resp), 200)
+
+
+@app.route('/files', methods=['POST'])
+@expects_json(post_file_req_schema)
+def post_file():
+    """
+    response:
+    {
+        "username": String
+        "filename": String,
+        "extension": String,
+        "size": Number,
+        "path": String,
     }
     """
     content = request.json
