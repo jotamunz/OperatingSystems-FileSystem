@@ -2,7 +2,7 @@
 from server import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-from JSONHandler.LoginHandler import createDrive, login, driveIsUnique
+from JSONHandler.loginHandler import createDrive, login, driveIsUnique
 
 # Request schemas
 post_drive_req_schema = {
@@ -26,6 +26,7 @@ post_drive_login_req_schema = {
 
 
 # Routes
+# Route to create a new drive with a new username
 @app.route('/drives', methods=['POST'])
 @expects_json(post_drive_req_schema)
 def post_drive():
@@ -51,6 +52,7 @@ def post_drive():
     return make_response(jsonify(resp), 200)
 
 
+# Route to login a drive user
 @app.route('/drives/login', methods=['POST'])
 @expects_json(post_drive_login_req_schema)
 def post_drive_login():
