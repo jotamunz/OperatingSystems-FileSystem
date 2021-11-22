@@ -1,4 +1,5 @@
-from JSONHandler.jsonHandler import *
+from JSONHandler.LoginHandler import *
 
-createDrive("Roo", 100)
+print(createDrive("Roo", "123", 100))
+print(login("Roo", "123"))
 
