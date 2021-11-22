@@ -1,1 +1,82 @@
-{"user": "Soap", "password": "QuesoTurrialba", "size": 87, "used": 0, "root": {"directories": [], "files": []}, "shared": {"directories": [], "files": []}}
+{
+    "user": "Soap",
+    "password": "123",
+    "size": 100,
+    "used": 20,
+    "root":
+    {
+        "name": "root",
+        "directories":
+        [
+            {
+                "name": "folder1",
+                "directories":
+                [
+                    {
+                        "name": "subfolder1",
+                        "directories": [],
+                        "files": []
+                    }
+                ],
+                "files":
+                [
+                    {
+                        "name": "file1",
+                        "extension": "txt",
+                        "creation": "date",
+                        "modification": "date",
+                        "size": 5,
+                        "content": "hello world"
+                    }
+                ]
+            },
+            {
+                "name": "folder2",
+                "directories": [],
+                "files": []
+            }
+        ],
+        "files":
+        [
+            {
+                "name": "file1",
+                "extension": "txt",
+                "creation": "date",
+                "modification": "date",
+                "size": 5,
+                "content": "hello world"
+            },
+            {
+                "name": "file2",
+                "extension": "txt",
+                "creation": "date",
+                "modification": "date",
+                "size": 5,
+                "content": "hello world"
+            }
+        ]
+    },
+    "shared":
+    {
+        "name": "shared",
+        "directories":
+        [
+            {
+                "name": "folder1",
+                "directories": [],
+                "files": []
+            }
+        ],
+        "files":
+        [
+            {
+                "name": "file1",
+                "extension": "txt",
+                "creation": "date",
+                "modification": "date",
+                "size": 5,
+                "content": "hello world"
+            }
+        ]
+    }
+}

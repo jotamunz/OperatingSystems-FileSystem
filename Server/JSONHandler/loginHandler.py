@@ -18,10 +18,12 @@ def newDrive(username, password, size):
         "size": size,
         "used": 0,
         "root": {
+            "name": "root",
             "directories": [],
             "files": []
         },
         "shared": {
+            "name": "shared",
             "directories": [],
             "files": []
         }
