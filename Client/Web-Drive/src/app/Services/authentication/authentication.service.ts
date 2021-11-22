@@ -17,9 +17,7 @@ export class AuthenticationService {
   constructor(private httpClient: HttpClient) {}
 
   public authenticateUser(userData: User): Observable<Object> {
-    return this.httpClient.post<Object>('http://localhost:8000/drives/login', {
-      ...userData,
-    });
+    return this.httpClient.post<Object>('/api/drives/login', userData);
   }
 
   public getUserInformation(): User {
