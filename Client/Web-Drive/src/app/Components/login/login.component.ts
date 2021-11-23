@@ -5,11 +5,9 @@ import { AuthenticationService } from '../../Services/authentication/authenticat
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
 import { SignUpComponent } from '../sign-up/sign-up.component';
 
 import User from '../../Models/user.model';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',

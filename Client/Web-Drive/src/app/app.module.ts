@@ -5,6 +5,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
 
+import { AuthenticationGuard } from './Guards/authentication.guard';
+
 import { AppComponent } from './app.component';
 import { LoginComponent } from './Components/login/login.component';
 import { SignUpComponent } from './Components/sign-up/sign-up.component';
@@ -19,7 +21,7 @@ import { DriveComponent } from './Components/drive/drive.component';
     BrowserAnimationsModule,
     MaterialModule,
   ],
-  providers: [],
+  providers: [AuthenticationGuard],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

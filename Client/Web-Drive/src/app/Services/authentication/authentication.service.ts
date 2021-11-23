@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { lastValueFrom } from 'rxjs';
 
 import User from '../../Models/user.model';
-import { catchError, lastValueFrom, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
