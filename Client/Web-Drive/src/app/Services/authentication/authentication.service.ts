@@ -25,6 +25,11 @@ export class AuthenticationService {
     return lastValueFrom(this.httpClient.post('/api/drives/login', userData));
   }
 
+  /**
+   * Registers a new user with its own Drive
+   * @param userData The data of the user
+   * @returns The data of the new user
+   */
   public registerUser(userData: any): Promise<User> {
     return lastValueFrom(this.httpClient.post('/api/drives', userData));
   }
