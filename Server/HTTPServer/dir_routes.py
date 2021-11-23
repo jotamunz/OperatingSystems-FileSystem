@@ -46,13 +46,16 @@ def get_dir():
     }
     """
     dir_path = request.args.get('dirPath')
+    if dir_path is None:
+        error = {"message": "Given URL has no directory path attribute"}
+        return make_response(jsonify(error), 408)
     resp = getDirContent(dir_path)
     if not resp:
         return make_response(jsonify(resp), 409)
     return make_response(jsonify(resp), 200)
 
 
-# Route to create a file
+# Route to create a directory in given path
 @app.route('/dirs', methods=['POST'])
 @expects_json(post_dir_req_schema)
 def post_dir():
@@ -73,4 +76,25 @@ def post_dir():
         error = {"message": "The given directory name is invalid, please try another", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
     resp = {"dirName": content["dirName"], "path": content["newDirPath"], "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to get the available space of a directory
+@app.route('/dirs', methods=['POST'])
+@expects_json(post_dir_req_schema)
+def get_dir_space():
+    """
+    response:
+    {
+        dirPath: String
+        remainingSpace: Number
+    }
+    """
+    dir_path = request.args.get('dirPath')
+    if dir_path is None:
+        error = {"message": "Given URL has no directory path attribute"}
+        return make_response(jsonify(error), 408)
+    resp = getDirContent(dir_path)
+    if not resp:
+        return make_response(jsonify(resp), 409)
     return make_response(jsonify(resp), 200)

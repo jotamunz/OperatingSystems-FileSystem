@@ -4,15 +4,6 @@ from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
 
 # Request schemas
-get_file_req_schema = {
-    "type": "object",
-    "properties": {
-        "username": {"type": "string"},
-        "filepath": {"type": "string"},
-        "filename": {"type": "string"}
-    },
-    "required": ["username", "filepath", "filename"]
-}
 
 post_file_req_schema = {
     "type": "object",
@@ -41,7 +32,6 @@ put_file_req_schema = {
 # Routes
 # Route to get properties and content of a file
 @app.route('/files', methods=['GET'])
-@expects_json(get_file_req_schema)
 def get_file():
     """
     response:
@@ -55,6 +45,12 @@ def get_file():
         "content": String
     }
     """
+    file_path = request.args.get('filePath')
+    if file_path is None:
+        error = {"message": "Given URL has no directory path parameter"}
+        return make_response(jsonify(error), 408)
+    file_name = request.args.get('fileName')
+
     content = request.json
     resp = {"Username": content["Username"], "AllocatedBytes": content["RequestedBytes"]}
     return make_response(jsonify(resp), 200)
