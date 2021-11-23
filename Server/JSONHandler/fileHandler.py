@@ -8,6 +8,30 @@ def getDirContent(path):
     jsonObject = readJSON(folders[0])
     return getContentFromPath(folders, jsonObject)
 
+def getFileContent(path, name):
+    folders = path.split("/")
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    for file in directory["files"]:
+        if file["name"] == name:
+            return file["content"]
+    return ""
+
+def getFileProperties(path, name):
+    folders = path.split("/")
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    for file in directory["files"]:
+        if file["name"] == name:
+            return {
+                "name": file["name"],
+                "extension": file["extension"],
+                "creation": file["creation"],
+                "modification": file["modification"],
+                "size": file["size"]
+            }
+    return {}
+
 def isHomeDir(folders):
     if len(folders) <= 1:
         return True
@@ -184,7 +208,5 @@ def modifyFileByName(jsonObject, name, content):
 def addSpace(jsonHome, space):
     jsonHome["used"] += space
     return
-
-
 
 
