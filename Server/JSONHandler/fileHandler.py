@@ -1,25 +1,6 @@
 from JSONHandler.jsonHandler import *
 import datetime
 
-def homeDirectory(username):
-    return {
-        "name": username,
-        "directories":
-        [
-            {
-                "name": "root",
-                "directories": [],
-                "files": []
-            },
-            {
-                "name": "shared",
-                "directories": [],
-                "files": []
-            }
-        ],
-        "files": []
-    }
-
 def getDirContent(path):
     folders = path.split("/")
     jsonObject = getDriveFromFolders(folders)
@@ -63,7 +44,7 @@ def createDir(path, name):
 def deleteDir(path, name):
     return createOrDeleteDir(path, name, False)
 
-def createOrDeleteDir(path, name, create):
+def createOrDeleteDir(path, name, isCreate):
     if nameIsValid(name):
         folders = path.split("/")
         jsonObject = readJSON(folders[0])
@@ -72,18 +53,18 @@ def createOrDeleteDir(path, name, create):
         folders.pop(0)
         mainDir = folders[0]
         folders.pop(0)
-        jsonObject[mainDir] = createOrDeleteDirRecursive(folders, name, jsonObject[mainDir], create)
+        jsonObject[mainDir] = createOrDeleteDirRecursive(folders, name, jsonObject[mainDir], isCreate)
         writeJSON(jsonObject)
         return True
     return False
 
-def createOrDeleteDirRecursive(folders, name, jsonObject, create):
+def createOrDeleteDirRecursive(folders, name, jsonObject, isCreate):
     if len(folders) == 0:
         for i, directory in enumerate(jsonObject["directories"]):
             if directory["name"] == name:
                 jsonObject["directories"].pop(i)
                 break
-        if create:
+        if isCreate:
             jsonObject["directories"].append({
                 "name": name,
                 "directories": [],
@@ -93,7 +74,7 @@ def createOrDeleteDirRecursive(folders, name, jsonObject, create):
     else:
         for i, directory in enumerate(jsonObject["directories"]):
             if directory["name"] == folders[0]:
-                jsonObject["directories"][i] = createOrDeleteDirRecursive(folders[1:], name, directory, create)
+                jsonObject["directories"][i] = createOrDeleteDirRecursive(folders[1:], name, directory, isCreate)
                 return jsonObject
         return jsonObject
 
@@ -118,7 +99,7 @@ def createFile(path, name, extension, content):
 def deleteFile(path, name):
     return createOrDeleteFile(path, name, None, None, False)
 
-def createOrDeleteFile(path, name, extension, content, create):
+def createOrDeleteFile(path, name, extension, content, isCreate):
     if nameIsValid(name):
         folders = path.split("/")
         jsonObject = readJSON(folders[0])
@@ -127,18 +108,19 @@ def createOrDeleteFile(path, name, extension, content, create):
         folders.pop(0)
         mainDir = folders[0]
         folders.pop(0)
-        jsonObject[mainDir] = createOrDeleteFileRecursive(folders, name, extension, content, jsonObject[mainDir], create)
+        jsonObject[mainDir] = createOrDeleteFileRecursive(folders, name, extension, content, jsonObject[mainDir], isCreate)
+        addOrSubtractSpace(jsonObject, content, isCreate)
         writeJSON(jsonObject)
         return True
     return False
 
-def createOrDeleteFileRecursive(folders, name, extension, content, jsonObject, create):
+def createOrDeleteFileRecursive(folders, name, extension, content, jsonObject, isCreate):
     if len(folders) == 0:
         for i, file in enumerate(jsonObject["files"]):
             if file["name"] == name:
                 jsonObject["files"].pop(i)
                 break
-        if create:
+        if isCreate:
             jsonObject["files"].append({
                 "name": name,
                 "extension": extension,
@@ -151,6 +133,12 @@ def createOrDeleteFileRecursive(folders, name, extension, content, jsonObject, c
     else:
         for i, directory in enumerate(jsonObject["directories"]):
             if directory["name"] == folders[0]:
-                jsonObject["directories"][i] = createOrDeleteFileRecursive(folders[1:], name, extension, content, directory, create)
+                jsonObject["directories"][i] = createOrDeleteFileRecursive(folders[1:], name, extension, content, directory, isCreate)
                 return jsonObject
         return jsonObject
+
+def addOrSubtractSpace(jsonObject, content, isAdd):
+    if isAdd:
+        jsonObject["used"] += len(content)
+    else:
+        jsonObject["used"] -= len(content)

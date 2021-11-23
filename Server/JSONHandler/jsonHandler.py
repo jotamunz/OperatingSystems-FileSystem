@@ -43,3 +43,22 @@ def fileExistsFisical(directory, name):
 def nameIsValid(name):
     invalidChars = set(string.punctuation.replace(" ", ""))
     return not any(char in invalidChars for char in name)
+
+def homeDirectory(username):
+    return {
+        "name": username,
+        "directories":
+        [
+            {
+                "name": "root",
+                "directories": [],
+                "files": []
+            },
+            {
+                "name": "shared",
+                "directories": [],
+                "files": []
+            }
+        ],
+        "files": []
+    }

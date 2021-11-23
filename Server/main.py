@@ -7,9 +7,10 @@ from JSONHandler.fileHandler import *
 if __name__ == '__main__':
     #app.run(host="0.0.0.0", port=8000, debug=False)
     #createDrive("Roo", "123", 100)
-    createDir("Roo/root", "xd")
+    #createDir("Roo/root", "xd")
     #createFile("Roo/root/lmao", "FILE", "txt", "BigRoo85")
     #deleteFile("Roo/root/lmao", "FILE")
+    print(getSpace("Roo"))
 
 
 
