@@ -8,6 +8,30 @@ def getDirContent(path):
     jsonObject = readJSON(folders[0])
     return getContentFromPath(folders, jsonObject)
 
+def getFileContent(path, name):
+    folders = path.split("/")
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    for file in directory["files"]:
+        if file["name"] == name:
+            return file["content"]
+    return ""
+
+def getFileProperties(path, name):
+    folders = path.split("/")
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    for file in directory["files"]:
+        if file["name"] == name:
+            return {
+                "name": file["name"],
+                "extension": file["extension"],
+                "creation": file["creation"],
+                "modification": file["modification"],
+                "size": file["size"]
+            }
+    return {}
+
 def isHomeDir(folders):
     if len(folders) <= 1:
         return True
@@ -185,6 +209,34 @@ def addSpace(jsonHome, space):
     jsonHome["used"] += space
     return
 
+def moveFile(path, name, newPath):
+    folders = path.split("/")
+    newFolders = newPath.split("/")
+    if isHomeDir(folders) or isHomeDir(newFolders):
+        return False
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    newDirectory = getContentFromPath(newFolders, jsonObject)
+    for i, file in enumerate(directory["files"]):
+        if file["name"] == name:
+            directory["files"].pop(i)
+            newDirectory["files"].append(file)
+            writeJSON(jsonObject)
+            return True
+    return False
 
-
-
+def moveDir(path, name, newPath):
+    folders = path.split("/")
+    newFolders = newPath.split("/")
+    if isHomeDir(folders) or isHomeDir(newFolders):
+        return False
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    newDirectory = getContentFromPath(newFolders, jsonObject)
+    for i, subDir in enumerate(directory["directories"]):
+        if subDir["name"] == name:
+            directory["directories"].pop(i)
+            newDirectory["directories"].append(subDir)
+            writeJSON(jsonObject)
+            return True
+    return False
