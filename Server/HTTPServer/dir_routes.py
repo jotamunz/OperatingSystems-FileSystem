@@ -1,17 +1,17 @@
 # Imports
 from HTTPServer import app
 from flask import request, jsonify, make_response
-from JSONHandler.fileHandler import getDirContent
+from JSONHandler.fileHandler import getDirContent, createDir, dirIsUnique
 from flask_expects_json import expects_json
 
 post_dir_req_schema = {
     "type": "object",
     "properties": {
-        "username": {"type": "string"},
-        "newDirPath": {"type": "number"},
-        "dirName": {"type": "string"}
+        "newDirPath": {"type": "string"},
+        "dirName": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
     },
-    "required": ["username", "newDirPath", "dirName"]
+    "required": ["newDirPath", "dirName", "forceOverwrite"]
 }
 
 
@@ -59,11 +59,18 @@ def post_dir():
     """
     response:
     {
-        "username": String
         "dirName": String,
         "path": String,
+        "requestOverwrite": Boolean
     }
     """
     content = request.json
-    resp = {}
+    if not dirIsUnique(content["newDirPath"], content["dirName"]) and not content["forceOverwrite"]:
+        error = {"message": "The given directory name already exists", "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    status = createDir(content["newDirPath"], content["dirName"])
+    if not status:
+        error = {"message": "The given directory name is invalid, please try another", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"dirName": content["dirName"], "path": content["newDirPath"], "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
