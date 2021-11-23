@@ -52,3 +52,7 @@ def login(username, password):
             if password == jsonObject["password"]:
                 return True
     return False
+
+def getSpace(username):
+    jsonObject = readJSON(username)
+    return jsonObject["size"], jsonObject["used"]
