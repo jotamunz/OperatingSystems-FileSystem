@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import User from '../../Models/user.model';
-import { Observable } from 'rxjs';
+import { catchError, lastValueFrom, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -16,8 +16,13 @@ export class AuthenticationService {
 
   constructor(private httpClient: HttpClient) {}
 
-  public authenticateUser(userData: User): Observable<Object> {
-    return this.httpClient.post<Object>('/api/drives/login', userData);
+  /**
+   * Authenticates user with credentials
+   * @param userData The credentials of the user
+   * @returns The response from the API
+   */
+  public authenticateUser(userData: User): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/drives/login', userData));
   }
 
   public getUserInformation(): User {

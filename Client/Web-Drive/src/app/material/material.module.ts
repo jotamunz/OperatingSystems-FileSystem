@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 const MaterialComponents = [
@@ -10,6 +11,7 @@ const MaterialComponents = [
   MatInputModule,
   FormsModule,
   MatIconModule,
+  MatSnackBarModule,
   ReactiveFormsModule,
   MatDialogModule,
 ];
