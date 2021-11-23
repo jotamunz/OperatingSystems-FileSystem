@@ -1,1 +1,77 @@
-<p>drive works!</p>
+<div class="container">
+  <!-- Left Section -->
+  <div class="nav-container">
+    <!-- Main Logo Button -->
+    <button mat-flat-button class="logo"></button>
+
+    <!-- Nav Bar -->
+    <nav>
+      <button mat-flat-button class="nav-button create">
+        <mat-icon> add_box </mat-icon> <span>Add</span>
+      </button>
+      <button mat-flat-button class="nav-button mov">
+        <mat-icon> save </mat-icon> <span>My Drive</span>
+      </button>
+      <button mat-flat-button class="nav-button mov">
+        <mat-icon> people </mat-icon> <span>Shared</span>
+      </button>
+
+      <!-- Capacity Card -->
+      <div class="capacity">
+        <div class="title">
+          <mat-icon> filter_drama </mat-icon><a> Storage </a>
+        </div>
+        <mat-progress-bar mode="determinate" value="40"></mat-progress-bar>
+        <span class="label"> 200B out of 1000B used </span>
+      </div>
+    </nav>
+  </div>
+  <!-- Top Deck -->
+  <main>
+    <div class="top-deck">
+      <!-- Search bar -->
+      <mat-form-field appearance="outline" class="search-bar">
+        <mat-label>Search on drive</mat-label>
+        <input matInput />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <!-- Logout Button -->
+      <button mat-fab color="primary">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+
+    <!-- Path Display -->
+    <div class="path">
+      <a>My Drive</a>
+      <a *ngFor="let directory of path">&nbsp; > &nbsp; {{ directory }}</a>
+    </div>
+
+    <div class="navegation-section">
+      <!-- Directories Section -->
+      <h2>Directories</h2>
+      <div class="directories">
+        <!-- Button for Directory -->
+        <button
+          mat-flat-button
+          class="directory"
+          *ngFor="let directory of directories"
+        >
+          <mat-icon> folder </mat-icon>
+          <span>Examen 1</span>
+        </button>
+      </div>
+
+      <!-- Files Section -->
+      <h2>Files</h2>
+      <div class="files">
+        <!-- Button for File -->
+        <button mat-flat-button class="file" *ngFor="let file of files">
+          <mat-icon> article </mat-icon>
+          <span>Examen 1</span>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>
