@@ -74,11 +74,41 @@ def createDir(path, name):
 
 def createDirRecursive(folders, name, jsonObject):
     if len(folders) == 0:
+        for i, directory in enumerate(jsonObject["directories"]):
+            if directory["name"] == name:
+                jsonObject["directories"].pop(i)
         jsonObject["directories"].append({
             "name": name,
             "directories": [],
             "files": []
             })
+        return jsonObject
+    else:
+        for i, directory in enumerate(jsonObject["directories"]):
+            if directory["name"] == folders[0]:
+                jsonObject["directories"][i] = createDirRecursive(folders[1:], name, directory)
+                return jsonObject
+        return jsonObject
+
+def deleteDir(path, name):
+    if nameIsValid(name):
+        folders = path.split("/")
+        jsonObject = readJSON(folders[0])
+        if len(folders) <= 1:
+            return False
+        folders.pop(0)
+        mainDir = folders[0]
+        folders.pop(0)
+        jsonObject[mainDir] = deleteDirRecursive(folders, name, jsonObject[mainDir])
+        writeJSON(jsonObject)
+        return True
+    return False
+
+def deleteDirRecursive(folders, name, jsonObject):
+    if len(folders) == 0:
+        for i, directory in enumerate(jsonObject["directories"]):
+            if directory["name"] == name:
+                jsonObject["directories"].pop(i)
         return jsonObject
     else:
         for directory in jsonObject["directories"]:
