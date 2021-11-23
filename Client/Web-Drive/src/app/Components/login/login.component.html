@@ -1,6 +1,7 @@
 <div class="container">
   <div class="login">
     <div class="login-input">
+      <h1><mat-icon>lock</mat-icon> Sign In</h1>
       <!-- Input for Username -->
       <mat-form-field class="form-field" appearance="fill">
         <mat-label>Username</mat-label>
@@ -8,7 +9,7 @@
           matInput
           [formControl]="loginFormControl"
           type="text"
-          [(ngModel)]="username"
+          [(ngModel)]="user.username"
         />
 
         <!-- Validations -->
@@ -18,11 +19,11 @@
 
         <!-- Clear Button -->
         <button
-          *ngIf="username"
+          *ngIf="user.username"
           matSuffix
           mat-icon-button
           aria-label="Clear"
-          (click)="username = ''"
+          (click)="user.username = ''"
         >
           <mat-icon>close</mat-icon>
         </button>
@@ -35,7 +36,7 @@
           matInput
           type="password"
           [formControl]="passwordFormControl"
-          [(ngModel)]="password"
+          [(ngModel)]="user.password"
         />
 
         <!-- Validations -->
@@ -45,11 +46,11 @@
 
         <!-- Clear Button -->
         <button
-          *ngIf="password"
+          *ngIf="user.password"
           matSuffix
           mat-icon-button
           aria-label="Clear"
-          (click)="password = ''"
+          (click)="user.password = ''"
         >
           <mat-icon>close</mat-icon>
         </button>
@@ -57,9 +58,15 @@
 
       <!-- Interaction Buttons -->
       <div class="login-buttons">
-        <a href="#" (click)="openDialog()">Register</a>
+        <a (click)="openDialog()">Register</a>
         <a href="#">Forgot Password?</a>
-        <button mat-raised-button color="primary">Sign-In</button>
+        <button
+          (click)="this.onSignInClick()"
+          mat-raised-button
+          color="primary"
+        >
+          Sign-In
+        </button>
       </div>
     </div>
   </div>
