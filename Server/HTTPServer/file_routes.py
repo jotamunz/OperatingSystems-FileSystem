@@ -2,19 +2,29 @@
 from HTTPServer import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
+from JSONHandler.fileHandler import fileIsUnique, spaceAvailable, createFile, deleteFile
 
 # Request schemas
 
 post_file_req_schema = {
     "type": "object",
     "properties": {
-        "username": {"type": "string"},
         "filepath": {"type": "string"},
-        "filename": {"type": "string"},
+        "newFileName": {"type": "string"},
         "extension": {"type": "string"},
-        "content": {"type": "string"}
+        "content": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
     },
-    "required": ["username", "filepath", "filename", "content", "extension"]
+    "required": ["filepath", "newFileName", "extension", "content", "forceOverwrite"]
+}
+
+delete_file_req_schema = {
+    "type": "object",
+    "properties": {
+        "filePath": {"type": "string"},
+        "fileName": {"type": "string"},
+    },
+    "required": ["filePath", "fileName"]
 }
 
 put_file_req_schema = {
@@ -50,9 +60,10 @@ def get_file():
         error = {"message": "Given URL has no directory path parameter"}
         return make_response(jsonify(error), 408)
     file_name = request.args.get('fileName')
-
-    content = request.json
-    resp = {"Username": content["Username"], "AllocatedBytes": content["RequestedBytes"]}
+    if file_name is None:
+        error = {"message": "Given URL has no file name parameter"}
+        return make_response(jsonify(error), 408)
+    resp = {"Username": ""}
     return make_response(jsonify(resp), 200)
 
 
@@ -63,15 +74,43 @@ def post_file():
     """
     response:
     {
-        "username": String
-        "filename": String,
-        "extension": String,
-        "size": Number,
+        "fileName": String,
+        "path": String,
+        "requestOverwrite": Boolean
+    }
+    """
+    content = request.json
+    if not fileIsUnique(content["filepath"], content["newFileName"]) and not content["forceOverwrite"]:
+        error = {"message": "The given directory name already exists", "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    if not spaceAvailable(content["filepath"], content["newFileName"]):
+        error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    status = createFile(content["filepath"], content["newFileName"], content["extension"], content["content"])
+    if not status:
+        error = {"message": "The given file name is invalid, please try another", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"fileName": content["newFileName"], "path": content["filepath"], "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to delete an existing file
+@app.route('/files', methods=['DELETE'])
+@expects_json(delete_file_req_schema)
+def delete_file():
+    """
+    response:
+    {
+        "fileName": String,
         "path": String,
     }
     """
     content = request.json
-    resp = {"Username": content["Username"], "AllocatedBytes": content["RequestedBytes"]}
+    status = deleteFile(content["filePath"], content["fileName"])
+    if not status:
+        error = {"message": "The file doesn't exist"}
+        return make_response(jsonify(error), 408)
+    resp = {"fileName": content["fileName"], "path": content["filePath"]}
     return make_response(jsonify(resp), 200)
 
 
