@@ -59,38 +59,12 @@ def dirIsUnique(path, name):
     return True
 
 def createDir(path, name):
-    if nameIsValid(name):
-        folders = path.split("/")
-        jsonObject = readJSON(folders[0])
-        if len(folders) <= 1:
-            return False
-        folders.pop(0)
-        mainDir = folders[0]
-        folders.pop(0)
-        jsonObject[mainDir] = createDirRecursive(folders, name, jsonObject[mainDir])
-        writeJSON(jsonObject)
-        return True
-    return False
-
-def createDirRecursive(folders, name, jsonObject):
-    if len(folders) == 0:
-        for i, directory in enumerate(jsonObject["directories"]):
-            if directory["name"] == name:
-                jsonObject["directories"].pop(i)
-        jsonObject["directories"].append({
-            "name": name,
-            "directories": [],
-            "files": []
-            })
-        return jsonObject
-    else:
-        for i, directory in enumerate(jsonObject["directories"]):
-            if directory["name"] == folders[0]:
-                jsonObject["directories"][i] = createDirRecursive(folders[1:], name, directory)
-                return jsonObject
-        return jsonObject
+    createOrDeleteDir(path, name, True)
 
 def deleteDir(path, name):
+    createOrDeleteDir(path, name, False)
+
+def createOrDeleteDir(path, name, create):
     if nameIsValid(name):
         folders = path.split("/")
         jsonObject = readJSON(folders[0])
@@ -99,19 +73,27 @@ def deleteDir(path, name):
         folders.pop(0)
         mainDir = folders[0]
         folders.pop(0)
-        jsonObject[mainDir] = deleteDirRecursive(folders, name, jsonObject[mainDir])
+        jsonObject[mainDir] = createOrDeleteDirRecursive(folders, name, jsonObject[mainDir], create)
         writeJSON(jsonObject)
         return True
     return False
 
-def deleteDirRecursive(folders, name, jsonObject):
+def createOrDeleteDirRecursive(folders, name, jsonObject, create):
     if len(folders) == 0:
         for i, directory in enumerate(jsonObject["directories"]):
             if directory["name"] == name:
                 jsonObject["directories"].pop(i)
+                break
+        if create:
+            jsonObject["directories"].append({
+                "name": name,
+                "directories": [],
+                "files": []
+                })
         return jsonObject
     else:
-        for directory in jsonObject["directories"]:
+        for i, directory in enumerate(jsonObject["directories"]):
             if directory["name"] == folders[0]:
-                return createDirRecursive(folders[1:], name, directory)
+                jsonObject["directories"][i] = createOrDeleteDirRecursive(folders[1:], name, directory, create)
+                return jsonObject
         return jsonObject
