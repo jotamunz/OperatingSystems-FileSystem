@@ -94,6 +94,16 @@ def deleteFile(path, name):
     writeJSON(jsonObject)
     return True
 
+def modifyFile(path, name, content):
+    folders = path.split("/")
+    if isHomeDir(folders):
+        return False
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    doAction(directory, name, 4, jsonObject, content)
+    writeJSON(jsonObject)
+    return True
+
 def recurseDirectories(folders, jsonObject):
     if len(folders) == 0:
         return jsonObject
@@ -122,6 +132,10 @@ def doAction(jsonObject, name, status, jsonHome, content=None, extension=None):
         case 3:
             size = deleteFileByName(jsonObject, name)
             addSpace(jsonHome, -size)
+        # Modify a files content
+        case 4:
+            size = modifyFileByName(jsonObject, name, content)
+            addSpace(jsonHome, size)
     return
 
 def deleteDirByName(jsonObject, name):
@@ -156,6 +170,16 @@ def createFileByName(jsonObject, name, extension, content):
         "content": content
     })
     return len(content)
+
+def modifyFileByName(jsonObject, name, content):
+    for file in jsonObject["files"]:
+        if file["name"] == name:
+            sizeDif = len(content) - file["size"]
+            file["modification"] = datetime.datetime.now().isoformat()
+            file["size"] = len(content)
+            file["content"] = content
+            return sizeDif
+    return 0
 
 def addSpace(jsonHome, space):
     jsonHome["used"] += space

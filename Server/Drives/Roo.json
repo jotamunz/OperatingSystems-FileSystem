@@ -1,1 +1,1 @@
-{"user": "Roo", "password": "123", "size": 100, "used": 8, "root": {"name": "root", "directories": [], "files": []}, "shared": {"name": "shared", "directories": [], "files": []}}
+{"user": "Roo", "password": "123", "size": 100, "used": 10, "root": {"name": "root", "directories": [{"name": "xd", "directories": [], "files": [{"name": "FILE", "extension": "txt", "creation": "2021-11-23T14:24:19.757679", "modification": "2021-11-23T14:25:48.850048", "size": 10, "content": "Hola Mundo"}]}], "files": []}, "shared": {"name": "shared", "directories": [], "files": []}}

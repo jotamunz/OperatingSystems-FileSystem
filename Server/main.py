@@ -9,7 +9,8 @@ if __name__ == '__main__':
     #createDrive("Roo", "123", 100)
     #createDir("Roo/root", "xd")
     #createFile("Roo/root/xd", "FILE", "txt", "BigRoo85")
-    deleteDir("Roo/root", "xd")
+    #deleteDir("Roo/root", "xd")
+    modifyFile("Roo/root/xd", "FILE", "Hola Mundo")
 
 
 
