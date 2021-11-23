@@ -25,6 +25,10 @@ export class AuthenticationService {
     return lastValueFrom(this.httpClient.post('/api/drives/login', userData));
   }
 
+  public registerUser(userData: any): Promise<User> {
+    return lastValueFrom(this.httpClient.post('/api/drives', userData));
+  }
+
   public getUserInformation(): User {
     return this.userInformation;
   }
