@@ -87,30 +87,6 @@ def get_dir():
     return make_response(jsonify(resp), 200)
 
 
-# Route to get the available space of a directory
-@app.route('/dirs/space', methods=['GET'])
-def get_dir_space():
-    """
-    Params:
-        dirPath
-    response:
-    {
-        dirPath: String
-        remainingSpace: Number
-    }
-    """
-    dir_path = request.args.get('dirPath')
-    if dir_path is None:
-        error = {"message": "Given URL has no directory path attribute"}
-        return make_response(jsonify(error), 408)
-    dir_content = getDirContent(dir_path)
-    if not dir_content:
-        error = {"message": "The given directory path doesn't exist"}
-        return make_response(jsonify(error), 409)
-    resp = {"dirPath": dir_path, "remainingSpace": 0}
-    return make_response(jsonify(resp), 200)
-
-
 # Route to create a directory in given path
 @app.route('/dirs', methods=['POST'])
 @expects_json(post_dir_req_schema)
@@ -177,7 +153,7 @@ def share_dir():
 # Route to move a directory
 @app.route('/dirs', methods=['PUT'])
 @expects_json(put_dir_req_schema)
-def share_dir():
+def move_dir():
     """
     response:
     {

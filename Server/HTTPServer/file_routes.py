@@ -2,7 +2,7 @@
 from HTTPServer import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-from JSONHandler.fileHandler import fileIsUnique, spaceAvailable, createFile, deleteFile
+from JSONHandler.fileHandler import fileIsUnique, spaceAvailable, createFile, deleteFile, modifyFile
 
 # Request schemas
 
@@ -16,6 +16,16 @@ post_file_req_schema = {
         "forceOverwrite": {"type": "boolean"}
     },
     "required": ["filepath", "newFileName", "extension", "content", "forceOverwrite"]
+}
+
+post_modify_file_req_schema = {
+    "type": "object",
+    "properties": {
+        "filePath": {"type": "string"},
+        "fileName": {"type": "string"},
+        "content": {"type": "string"},
+    },
+    "required": ["filePath", "fileName", "content"]
 }
 
 delete_file_req_schema = {
@@ -91,6 +101,28 @@ def post_file():
         error = {"message": "The given file name is invalid, please try another", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
     resp = {"fileName": content["newFileName"], "path": content["filepath"], "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+@app.route('/files/modify', methods=['POST'])
+@expects_json(post_modify_file_req_schema)
+def modify_file():
+    """
+    response:
+    {
+        "fileName": String,
+        "path": String
+    }
+    """
+    content = request.json
+    if not spaceAvailable(content["filePath"], content["fileName"]):
+        error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    status = modifyFile(content["filePath"], content["fileName"], content["content"])
+    if not status:
+        error = {"message": "The given file could not be modified"}
+        return make_response(jsonify(error), 409)
+    resp = {"fileName": content["fileName"], "path": content["filePath"]}
     return make_response(jsonify(resp), 200)
 
 
