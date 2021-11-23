@@ -217,13 +217,10 @@ def moveFile(path, name, newPath):
     jsonObject = readJSON(folders[0])
     directory = getContentFromPath(folders, jsonObject)
     newDirectory = getContentFromPath(newFolders, jsonObject)
-    for i, file in enumerate(directory["files"]):
-        if file["name"] == name:
-            directory["files"].pop(i)
-            newDirectory["files"].append(file)
-            writeJSON(jsonObject)
-            return True
-    return False
+    size = moveFileByName(directory, name, newDirectory, False)
+    addSpace(jsonObject, size)
+    writeJSON(jsonObject)
+    return True
 
 def moveDir(path, name, newPath):
     folders = path.split("/")
@@ -240,3 +237,32 @@ def moveDir(path, name, newPath):
             writeJSON(jsonObject)
             return True
     return False
+
+def shareFile(path, name, newUser):
+    folders = path.split("/")
+    if isHomeDir(folders):
+        return False
+    jsonObject = readJSON(folders[0])
+    jsonNewUser = readJSON(newUser)
+    directory = getContentFromPath(folders, jsonObject)
+    newDirectory = jsonNewUser["shared"]
+    size = moveFileByName(directory, name, newDirectory, True)
+    addSpace(jsonNewUser, size)
+    writeJSON(jsonObject)
+    writeJSON(jsonNewUser)
+    return True
+
+def moveFileByName(directory, name, newDirectory, isShare):
+    for i, file in enumerate(directory["files"]):
+        if file["name"] == name:
+            sizeDif = deleteFileByName(newDirectory, name)
+            newDirectory["files"].append(file)
+            if not isShare:
+                directory["files"].pop(i)
+            else:
+                sizeDif = file["size"] - sizeDif
+            return sizeDif
+    return 0
+
+
+# force overwrite, calculate space
