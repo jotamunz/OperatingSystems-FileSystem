@@ -2,6 +2,17 @@
 from HTTPServer import app
 from flask import request, jsonify, make_response
 from JSONHandler.fileHandler import getDirContent
+from flask_expects_json import expects_json
+
+post_dir_req_schema = {
+    "type": "object",
+    "properties": {
+        "username": {"type": "string"},
+        "newDirPath": {"type": "number"},
+        "dirName": {"type": "string"}
+    },
+    "required": ["username", "newDirPath", "dirName"]
+}
 
 
 # Routes
@@ -38,4 +49,21 @@ def get_dir():
     resp = getDirContent(dir_path)
     if not resp:
         return make_response(jsonify(resp), 409)
+    return make_response(jsonify(resp), 200)
+
+
+# Route to create a file
+@app.route('/dirs', methods=['POST'])
+@expects_json(post_dir_req_schema)
+def post_dir():
+    """
+    response:
+    {
+        "username": String
+        "dirName": String,
+        "path": String,
+    }
+    """
+    content = request.json
+    resp = {}
     return make_response(jsonify(resp), 200)
