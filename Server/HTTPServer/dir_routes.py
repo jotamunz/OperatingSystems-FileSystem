@@ -23,7 +23,7 @@ delete_dir_req_schema = {
     "required": ["dirPath", "dirName"]
 }
 
-put_dir_req_schema = {
+share_dir_req_schema = {
     "type": "object",
     "properties": {
         "sourceUsername": {"type": "string"},
@@ -32,6 +32,17 @@ put_dir_req_schema = {
         "destinyUsername": {"type": "string"}
     },
     "required": ["sourceUsername", "dirPath", "dirName", "destinyUsername"]
+}
+
+put_dir_req_schema = {
+    "type": "object",
+    "properties": {
+        "dirPath": {"type": "string"},
+        "dirName": {"type": "string"},
+        "destinyPath": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
+    },
+    "required": ["dirPath", "dirName", "destinyPath", "destinyUsername"]
 }
 
 
@@ -145,6 +156,25 @@ def delete_dir():
 
 
 # Route to share a file with another user
+@app.route('/dirs/share', methods=['POST'])
+@expects_json(share_dir_req_schema)
+def share_dir():
+    """
+    response:
+    {
+        "sourceUsername": String
+        "destinyUsername": String,
+        "sharedDireName": String
+
+    }
+    """
+    content = request.json
+    resp = {"sourceUsername": content["sourceUsername"], "destinyUsername": content["destinyUsername"],
+            "sharedDireName": content["dirPath"]}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to move a directory
 @app.route('/dirs', methods=['PUT'])
 @expects_json(put_dir_req_schema)
 def share_dir():
