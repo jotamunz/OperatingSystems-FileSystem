@@ -2,7 +2,7 @@
 from HTTPServer import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-from JSONHandler.loginHandler import createDrive, login, driveIsUnique
+from JSONHandler.loginHandler import createDrive, login, driveIsUnique, getSpace
 
 # Request schemas
 post_drive_req_schema = {
@@ -68,4 +68,26 @@ def post_drive_login():
         error = {"status": False, "message": "Invalid username or password, please try another"}
         return make_response(jsonify(error), 409)
     resp = {"status": True}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to get the available space of a Drive
+@app.route('/drives/spaces', methods=['GET'])
+def get_drive_space():
+    """
+    Params:
+        username
+    response:
+    {
+        username: String,
+        usedSpace: Number.
+        totalSpace: Number
+    }
+    """
+    drive_username = request.args.get('username')
+    if drive_username is None:
+        error = {"message": "Given URL has no username drive attribute"}
+        return make_response(jsonify(error), 408)
+    drive_space = getSpace(drive_username)
+    resp = {"username": drive_username, "usedSpace": drive_space[1], "totalSpace": drive_space[0]}
     return make_response(jsonify(resp), 200)
