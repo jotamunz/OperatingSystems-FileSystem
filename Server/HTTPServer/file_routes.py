@@ -2,20 +2,21 @@
 from HTTPServer import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-from JSONHandler.fileHandler import fileIsUnique, spaceAvailable, createFile, deleteFile, modifyFile
+from JSONHandler.fileHandler import fileIsUnique, spaceAvailable, createFile, deleteFile, modifyFile, \
+    getFileContent, getFileProperties, moveFile
 
 # Request schemas
 
 post_file_req_schema = {
     "type": "object",
     "properties": {
-        "filepath": {"type": "string"},
+        "filePath": {"type": "string"},
         "newFileName": {"type": "string"},
         "extension": {"type": "string"},
         "content": {"type": "string"},
         "forceOverwrite": {"type": "boolean"}
     },
-    "required": ["filepath", "newFileName", "extension", "content", "forceOverwrite"]
+    "required": ["filePath", "newFileName", "extension", "content", "forceOverwrite"]
 }
 
 post_modify_file_req_schema = {
@@ -27,6 +28,18 @@ post_modify_file_req_schema = {
     },
     "required": ["filePath", "fileName", "content"]
 }
+
+post_move_file_req_schema = {
+    "type": "object",
+    "properties": {
+        "filePath": {"type": "string"},
+        "fileName": {"type": "string"},
+        "destinyPath": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
+    },
+    "required": ["filePath", "fileName", "destinyPath", "forceOverwrite"]
+}
+
 
 delete_file_req_schema = {
     "type": "object",
@@ -50,20 +63,24 @@ put_file_req_schema = {
 
 
 # Routes
-# Route to get properties and content of a file
+# Route to get properties or content of a file
 @app.route('/files', methods=['GET'])
 def get_file():
     """
+    Params:
+        filePath, fileName, content
     response:
     {
-        "name": String,
+        "fileName": String,
         "extension": String,
-        "creation": String (YYYY-MM-DD HH:MM:SS),
-        "modification": String (YYYY-MM-DD HH:MM:SS),
+        "creation": String,
+        "modification": String,
         "size": Number,
-        "path": String,
+        "filePath": String,
         "content": String
     }
+    if content = true, only the content field will be sent,
+    otherwise route will respond with file properties fields only
     """
     file_path = request.args.get('filePath')
     if file_path is None:
@@ -73,7 +90,18 @@ def get_file():
     if file_name is None:
         error = {"message": "Given URL has no file name parameter"}
         return make_response(jsonify(error), 408)
-    resp = {"Username": ""}
+    content = request.args.get('content')
+    if content is None:
+        error = {"message": "Given URL has no content parameter"}
+        return make_response(jsonify(error), 408)
+    if content == "true":
+        resp = getFileContent(file_path, file_name)
+        resp = None if resp == "" else {"content": resp}
+    else:
+        resp = getFileProperties(file_path, file_name)
+    if resp is None:
+        error = {"message": "The given file doesn't exist"}
+        return make_response(jsonify(error), 408)
     return make_response(jsonify(resp), 200)
 
 
@@ -85,25 +113,50 @@ def post_file():
     response:
     {
         "fileName": String,
-        "path": String,
+        "filePath": String,
         "requestOverwrite": Boolean
     }
     """
     content = request.json
-    if not fileIsUnique(content["filepath"], content["newFileName"]) and not content["forceOverwrite"]:
-        error = {"message": "The given directory name already exists", "requestOverwrite": True}
+    if not fileIsUnique(content["filePath"], content["newFileName"]) and not content["forceOverwrite"]:
+        error = {"message": "The given file name already exists", "requestOverwrite": True}
         return make_response(jsonify(error), 409)
-    if not spaceAvailable(content["filepath"], content["newFileName"]):
+    if not spaceAvailable(content["filePath"], content["newFileName"]):
         error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
-    status = createFile(content["filepath"], content["newFileName"], content["extension"], content["content"])
+    status = createFile(content["filePath"], content["newFileName"], content["extension"], content["content"])
     if not status:
         error = {"message": "The given file name is invalid, please try another", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
-    resp = {"fileName": content["newFileName"], "path": content["filepath"], "requestOverwrite": False}
+    resp = {"fileName": content["newFileName"], "filePath": content["filePath"], "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
 
 
+# Route to move a file
+@app.route('/files/move', methods=['POST'])
+@expects_json(post_move_file_req_schema)
+def move_file():
+    """
+    response:
+    {
+        "fileName": String,
+        "filePath": String,
+        "requestOverwrite": String
+    }
+    """
+    content = request.json
+    if not fileIsUnique(content["filePath"], content["fileName"]) and not content["forceOverwrite"]:
+        error = {"message": "Another file already exists at destination with the same name", "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    status = moveFile(content["filePath"], content["fileName"], content["destinyPath"])
+    if not status:
+        error = {"message": "The file could not be moved", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"fileName": content["fileName"], "filePath": content["filePath"], "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to modify a file
 @app.route('/files/modify', methods=['POST'])
 @expects_json(post_modify_file_req_schema)
 def modify_file():
