@@ -1,7 +1,7 @@
 # Imports
 from HTTPServer import app
 from flask import request, jsonify, make_response
-from JSONHandler.fileHandler import getDirContent, createDir, dirIsUnique
+from JSONHandler.fileHandler import getDirContent, createDir, dirIsUnique, deleteDir
 from flask_expects_json import expects_json
 
 post_dir_req_schema = {
@@ -12,6 +12,37 @@ post_dir_req_schema = {
         "forceOverwrite": {"type": "boolean"}
     },
     "required": ["newDirPath", "dirName", "forceOverwrite"]
+}
+
+delete_dir_req_schema = {
+    "type": "object",
+    "properties": {
+        "dirPath": {"type": "string"},
+        "dirName": {"type": "string"},
+    },
+    "required": ["dirPath", "dirName"]
+}
+
+share_dir_req_schema = {
+    "type": "object",
+    "properties": {
+        "sourceUsername": {"type": "string"},
+        "dirPath": {"type": "string"},
+        "dirName": {"type": "string"},
+        "destinyUsername": {"type": "string"}
+    },
+    "required": ["sourceUsername", "dirPath", "dirName", "destinyUsername"]
+}
+
+put_dir_req_schema = {
+    "type": "object",
+    "properties": {
+        "dirPath": {"type": "string"},
+        "dirName": {"type": "string"},
+        "destinyPath": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
+    },
+    "required": ["dirPath", "dirName", "destinyPath", "destinyUsername"]
 }
 
 
@@ -46,13 +77,41 @@ def get_dir():
     }
     """
     dir_path = request.args.get('dirPath')
+    if dir_path is None:
+        error = {"message": "Given URL has no directory path attribute"}
+        return make_response(jsonify(error), 408)
     resp = getDirContent(dir_path)
     if not resp:
-        return make_response(jsonify(resp), 409)
+        error = {"message": "The given directory path doesn't exist"}
+        return make_response(jsonify(error), 409)
     return make_response(jsonify(resp), 200)
 
 
-# Route to create a file
+# Route to get the available space of a directory
+@app.route('/dirs/space', methods=['GET'])
+def get_dir_space():
+    """
+    Params:
+        dirPath
+    response:
+    {
+        dirPath: String
+        remainingSpace: Number
+    }
+    """
+    dir_path = request.args.get('dirPath')
+    if dir_path is None:
+        error = {"message": "Given URL has no directory path attribute"}
+        return make_response(jsonify(error), 408)
+    dir_content = getDirContent(dir_path)
+    if not dir_content:
+        error = {"message": "The given directory path doesn't exist"}
+        return make_response(jsonify(error), 409)
+    resp = {"dirPath": dir_path, "remainingSpace": 0}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to create a directory in given path
 @app.route('/dirs', methods=['POST'])
 @expects_json(post_dir_req_schema)
 def post_dir():
@@ -73,4 +132,62 @@ def post_dir():
         error = {"message": "The given directory name is invalid, please try another", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
     resp = {"dirName": content["dirName"], "path": content["newDirPath"], "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to delete an existing file
+@app.route('/dirs', methods=['DELETE'])
+@expects_json(delete_dir_req_schema)
+def delete_dir():
+    """
+    response:
+    {
+        "dirName": String,
+        "dirPath": String,
+    }
+    """
+    content = request.json
+    status = deleteDir(content["dirPath"], content["dirName"])
+    if not status:
+        error = {"message": "The directory doesn't exist"}
+        return make_response(jsonify(error), 408)
+    resp = {"dirName": content["dirName"], "dirPath": content["dirPath"]}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to share a file with another user
+@app.route('/dirs/share', methods=['POST'])
+@expects_json(share_dir_req_schema)
+def share_dir():
+    """
+    response:
+    {
+        "sourceUsername": String
+        "destinyUsername": String,
+        "sharedDireName": String
+
+    }
+    """
+    content = request.json
+    resp = {"sourceUsername": content["sourceUsername"], "destinyUsername": content["destinyUsername"],
+            "sharedDireName": content["dirPath"]}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to move a directory
+@app.route('/dirs', methods=['PUT'])
+@expects_json(put_dir_req_schema)
+def share_dir():
+    """
+    response:
+    {
+        "sourceUsername": String
+        "destinyUsername": String,
+        "sharedDireName": String
+
+    }
+    """
+    content = request.json
+    resp = {"sourceUsername": content["sourceUsername"], "destinyUsername": content["destinyUsername"],
+            "sharedDireName": content["dirPath"]}
     return make_response(jsonify(resp), 200)
