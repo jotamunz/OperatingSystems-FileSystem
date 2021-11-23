@@ -1,10 +1,21 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [];
+import { LoginComponent } from './Components/login/login.component';
+import { DriveComponent } from './Components/drive/drive.component';
+import { AuthenticationGuard } from './Guards/authentication.guard';
+
+const routes: Routes = [
+  { path: '', component: LoginComponent },
+  {
+    path: 'my-drive',
+    component: DriveComponent,
+    canActivate: [AuthenticationGuard],
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
