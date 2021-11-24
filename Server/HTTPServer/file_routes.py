@@ -78,7 +78,7 @@ post_vv_copy_file_req_schema = {
 def get_file():
     """
     Params:
-        filePath, fileName, content
+        filePath, fileName, contentOnly
     response:
     {
         "fileName": String,
@@ -100,9 +100,9 @@ def get_file():
     if file_name is None:
         error = {"message": "Given URL has no file name parameter"}
         return make_response(jsonify(error), 408)
-    content = request.args.get('content')
+    content = request.args.get('contentOnly')
     if content is None:
-        error = {"message": "Given URL has no content parameter"}
+        error = {"message": "Given URL has no content only parameter"}
         return make_response(jsonify(error), 408)
     if content == "true":
         resp = getFileContent(file_path, file_name)
