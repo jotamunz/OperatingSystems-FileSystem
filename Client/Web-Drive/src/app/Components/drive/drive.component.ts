@@ -24,6 +24,7 @@ export class DriveComponent implements OnInit {
   user : User = {};
 
 
+
   constructor(
     private routerService: Router,
     private authenticationService: AuthenticationService,
@@ -38,7 +39,18 @@ export class DriveComponent implements OnInit {
   }
 
 
+/**
+   * Ends session
+   * @returns void
+   */
+ public onClickLogout(){
+   this.user.allocatedBytes = 0;
+   this.user.password = '';
+   this.user.username = '';
 
+   this.authenticationService.setUserInformation(this.user);
+  this.routerService.navigateByUrl('/');
+}
 
 /**
    * Get Current path
@@ -73,6 +85,19 @@ export class DriveComponent implements OnInit {
       await this.getDir(this.getCurrentPath());
       
     }
+
+
+   /**
+   * Change Dir to selected Dir
+   * @returns void
+   */
+    public async onClickChangeDir(path:any){
+      this.path = [];
+      this.path.push(path);
+      await this.getDir(this.getCurrentPath());
+      
+    }
+
 
   /**
    * Get dir from specific path

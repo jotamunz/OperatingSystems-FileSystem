@@ -7,6 +7,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
+
 
 const MaterialComponents = [
   MatButtonModule,
@@ -17,7 +19,8 @@ const MaterialComponents = [
   ReactiveFormsModule,
   MatDialogModule,
   MatProgressBarModule,
-  MatCardModule
+  MatCardModule,
+  MatMenuModule,
 ];
 
 @NgModule({
