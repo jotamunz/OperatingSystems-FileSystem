@@ -55,8 +55,11 @@ export class DriveComponent implements OnInit {
     this.dialog.open(FileViewComponent);
   }
 
+  /**
+   * Opens the dialog for creating a new directory
+   */
   public openCreateDirectoryDialog(): void {
-    this.dialog.open(CreateDirectoryComponent);
+    this.dialog.open(CreateDirectoryComponent, { width: '500px' });
   }
 
   /**
