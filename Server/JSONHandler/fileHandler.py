@@ -70,9 +70,13 @@ def fileIsUnique(path, name):
     return True
 
 def spaceAvailableFile(path, content):
-    folders = path.split("/")
-    jsonObject = readJSON(folders[0])
+    username = path.split("/")[0]
+    jsonObject = readJSON(username)
     return jsonObject["size"] >= jsonObject["used"] + len(content)
+
+def spaceAvailableShareFile(path, sharingPath):
+    # TO DO
+    return True
 
 def getSizeOfDir(directory):
     size = 0
@@ -90,7 +94,7 @@ def recurseSizeOfDir(directory):
         size += getSizeOfDir(directory)
         return size
 
-def spaceAvailableDir(path, sharingPath):
+def spaceAvailableShareDir(path, sharingPath):
     username = path.split("/")[0]
     jsonObject = readJSON(username)
     folders = sharingPath.split("/")
