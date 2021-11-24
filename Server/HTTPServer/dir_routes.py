@@ -34,27 +34,15 @@ post_move_dir_req_schema = {
     "required": ["dirPath", "dirName", "destinyPath", "forceOverwrite"]
 }
 
-
-share_dir_req_schema = {
-    "type": "object",
-    "properties": {
-        "sourceUsername": {"type": "string"},
-        "dirPath": {"type": "string"},
-        "dirName": {"type": "string"},
-        "destinyUsername": {"type": "string"}
-    },
-    "required": ["sourceUsername", "dirPath", "dirName", "destinyUsername"]
-}
-
-put_dir_req_schema = {
+post_share_dir_req_schema = {
     "type": "object",
     "properties": {
         "dirPath": {"type": "string"},
         "dirName": {"type": "string"},
-        "destinyPath": {"type": "string"},
+        "destinyUsername": {"type": "string"},
         "forceOverwrite": {"type": "boolean"}
     },
-    "required": ["dirPath", "dirName", "destinyPath", "destinyUsername"]
+    "required": ["dirPath", "dirName", "destinyUsername", "forceOverwrite"]
 }
 
 
@@ -145,27 +133,8 @@ def delete_dir():
     return make_response(jsonify(resp), 200)
 
 
-# Route to share a directory with another user
-@app.route('/dirs/share', methods=['POST'])
-@expects_json(share_dir_req_schema)
-def share_dir():
-    """
-    response:
-    {
-        "sourceUsername": String
-        "destinyUsername": String,
-        "sharedDireName": String
-
-    }
-    """
-    content = request.json
-    resp = {"sourceUsername": content["sourceUsername"], "destinyUsername": content["destinyUsername"],
-            "sharedDireName": content["dirPath"]}
-    return make_response(jsonify(resp), 200)
-
-
 # Route to move a directory
-@app.route('/dirs/move', methods=['PUT'])
+@app.route('/dirs/move', methods=['POST'])
 @expects_json(post_move_dir_req_schema)
 def move_dir():
     """
@@ -178,12 +147,30 @@ def move_dir():
     """
     content = request.json
     if not dirIsUnique(content["dirPath"], content["dirName"]) and not content["forceOverwrite"]:
-        error = {"message": "Another directory already exists at destination with the same name",
+        error = {"message": "Another directory already exists at the shared directory of the target user",
                  "requestOverwrite": True}
         return make_response(jsonify(error), 409)
-    status = moveDir(content["dirName"], content["dirName"], content["destinyPath"])
+    status = False
     if not status:
         error = {"message": "The directory could not be moved", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
     resp = {"dirName": content["fileName"], "dirPath": content["filePath"], "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to share a directory with another user
+@app.route('/dirs/share', methods=['POST'])
+@expects_json(post_share_dir_req_schema)
+def share_dir():
+    """
+    response:
+    {
+        "sourceUsername": String
+        "destinyUsername": String,
+        "sharedDirName": String
+    }
+    """
+    content = request.json
+    resp = {"sourceUsername": content["sourceUsername"], "destinyUsername": content["destinyUsername"],
+            "sharedDirName": content["dirPath"]}
     return make_response(jsonify(resp), 200)

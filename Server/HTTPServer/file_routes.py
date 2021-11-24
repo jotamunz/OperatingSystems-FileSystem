@@ -50,15 +50,15 @@ delete_file_req_schema = {
     "required": ["filePath", "fileName"]
 }
 
-put_file_req_schema = {
+post_share_file_req_schema = {
     "type": "object",
     "properties": {
-        "sourceUsername": {"type": "string"},
-        "filepath": {"type": "string"},
-        "filename": {"type": "string"},
-        "destinyUsername": {"type": "string"}
+        "filePath": {"type": "string"},
+        "fileName": {"type": "string"},
+        "destinyUsername": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
     },
-    "required": ["sourceUsername", "filepath", "filename", "destinyUsername"]
+    "required": ["filePath", "fileName", "destinyUsername", "forceOverwrite"]
 }
 
 
@@ -200,19 +200,19 @@ def delete_file():
 
 
 # Route to share a file with another user
-@app.route('/files', methods=['PUT'])
-@expects_json(put_file_req_schema)
+@app.route('/files/share', methods=['POST'])
+@expects_json(post_share_file_req_schema)
 def share_file():
     """
     response:
     {
         "sourceUsername": String
         "destinyUsername": String,
-        "sharedFilename": String
+        "sharedFileName": String
 
     }
     """
     content = request.json
-    resp = {"sourceUsername": content["Username"], "destinyUsername": content["destinyUsername"],
-            "sharedFilename": content["filename"]}
+    resp = {"sourceUsername": content[""], "destinyUsername": content[""],
+            "sharedFileName": content[""]}
     return make_response(jsonify(resp), 200)
