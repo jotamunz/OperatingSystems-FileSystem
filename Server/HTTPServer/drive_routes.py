@@ -91,3 +91,16 @@ def get_drive_space():
     drive_space = getSpace(drive_username)
     resp = {"username": drive_username, "usedSpace": drive_space[1], "totalSpace": drive_space[0]}
     return make_response(jsonify(resp), 200)
+
+
+# Route to get all the existing usernames with drives
+@app.route('/drives', methods=['GET'])
+def get_drive():
+    """
+    response:
+    {
+        username: [String],
+    }
+    """
+
+    return make_response(jsonify(resp), 200)
