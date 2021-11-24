@@ -2,8 +2,8 @@
 from HTTPServer import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-from JSONHandler.fileHandler import fileIsUnique, spaceAvailable, createFile, deleteFile, modifyFile, \
-    getFileContent, getFileProperties, moveFile
+from JSONHandler.fileHandler import fileIsUnique, spaceAvailableShareFile, createFile, deleteFile, modifyFile, \
+    getFileContent, getFileProperties, moveFile, shareFile, spaceAvailableFile
 
 # Request schemas
 
@@ -24,7 +24,7 @@ post_modify_file_req_schema = {
     "properties": {
         "filePath": {"type": "string"},
         "fileName": {"type": "string"},
-        "content": {"type": "string"},
+        "content": {"type": "string"}
     },
     "required": ["filePath", "fileName", "content"]
 }
@@ -40,25 +40,24 @@ post_move_file_req_schema = {
     "required": ["filePath", "fileName", "destinyPath", "forceOverwrite"]
 }
 
-
 delete_file_req_schema = {
     "type": "object",
     "properties": {
         "filePath": {"type": "string"},
-        "fileName": {"type": "string"},
+        "fileName": {"type": "string"}
     },
     "required": ["filePath", "fileName"]
 }
 
-put_file_req_schema = {
+post_share_file_req_schema = {
     "type": "object",
     "properties": {
-        "sourceUsername": {"type": "string"},
-        "filepath": {"type": "string"},
-        "filename": {"type": "string"},
-        "destinyUsername": {"type": "string"}
+        "filePath": {"type": "string"},
+        "fileName": {"type": "string"},
+        "destinyUsername": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
     },
-    "required": ["sourceUsername", "filepath", "filename", "destinyUsername"]
+    "required": ["filePath", "fileName", "destinyUsername", "forceOverwrite"]
 }
 
 
@@ -121,7 +120,7 @@ def post_file():
     if not fileIsUnique(content["filePath"], content["newFileName"]) and not content["forceOverwrite"]:
         error = {"message": "The given file name already exists", "requestOverwrite": True}
         return make_response(jsonify(error), 409)
-    if not spaceAvailable(content["filePath"], content["newFileName"]):
+    if not spaceAvailableFile(content["filePath"], content["newFileName"]):
         error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
     status = createFile(content["filePath"], content["newFileName"], content["extension"], content["content"])
@@ -168,7 +167,7 @@ def modify_file():
     }
     """
     content = request.json
-    if not spaceAvailable(content["filePath"], content["fileName"]):
+    if not spaceAvailableFile(content["filePath"], content["fileName"]):
         error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
     status = modifyFile(content["filePath"], content["fileName"], content["content"])
@@ -200,19 +199,30 @@ def delete_file():
 
 
 # Route to share a file with another user
-@app.route('/files', methods=['PUT'])
-@expects_json(put_file_req_schema)
+@app.route('/files/share', methods=['POST'])
+@expects_json(post_share_file_req_schema)
 def share_file():
     """
     response:
     {
-        "sourceUsername": String
         "destinyUsername": String,
-        "sharedFilename": String
+        "sharedFileName": String
 
     }
     """
     content = request.json
-    resp = {"sourceUsername": content["Username"], "destinyUsername": content["destinyUsername"],
-            "sharedFilename": content["filename"]}
+    if not fileIsUnique(content["destinyUsername"] + "/shared", content["fileName"]) and not content["forceOverwrite"]:
+        error = {"message": "Another file already exists at the shared folder of target user",
+                 "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    if not spaceAvailableShareFile(content["destinyUsername"], content["filePath"], content["fileName"]):
+        error = {"message": "Sufficient space isn't available in target user shared directory",
+                 "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    status = shareFile(content["filePath"], content["fileName"], content["destinyUsername"])
+    if not status:
+        error = {"message": "The file could not be shared", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"destinyUsername": content["destinyUsername"], "sharedFileName": content["fileName"],
+            "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
