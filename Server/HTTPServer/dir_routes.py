@@ -46,6 +46,17 @@ post_share_dir_req_schema = {
     "required": ["dirPath", "dirName", "destinyUsername", "forceOverwrite"]
 }
 
+post_vv_copy_dir_req_schema = {
+    "type": "object",
+    "properties": {
+        "dirPath": {"type": "string"},
+        "dirName": {"type": "string"},
+        "destinyPath": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
+    },
+    "required": ["dirPath", "dirName", "destinyPath", "forceOverwrite"]
+}
+
 
 # Routes
 # Route to get a specific dir of an user
@@ -186,4 +197,31 @@ def share_dir():
         return make_response(jsonify(error), 409)
     resp = {"destinyUsername": content["destinyUsername"], "sharedFileName": content["dirName"],
             "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to make a vv copy of a dir
+@app.route('/dirs/vvcopy', methods=['POST'])
+@expects_json(post_vv_copy_dir_req_schema)
+def vv_copy_dir():
+    """
+    response:
+    {
+        "dirName": String,
+        "dirPath": String,
+        "requestOverwrite": Boolean
+    }
+    """
+    content = request.json
+    if not dirIsUnique(content["destinyPath"], content["dirName"]) and not content["forceOverwrite"]:
+        error = {"message": "The given directory name already exists at target location", "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    if not spaceAvailableShareDir(content["destinyPath"].split("/")[0], content["dirPath"], content["dirName"]):
+        error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    status = moveDir(content["dirPath"], content["dirName"], content["destinyPath"], True)
+    if not status:
+        error = {"message": "The directory could not be copied", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"dirName": content["dirName"], "dirPath": content["dirPath"], "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
