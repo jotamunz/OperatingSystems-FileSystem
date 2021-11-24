@@ -24,7 +24,7 @@ post_modify_file_req_schema = {
     "properties": {
         "filePath": {"type": "string"},
         "fileName": {"type": "string"},
-        "content": {"type": "string"},
+        "content": {"type": "string"}
     },
     "required": ["filePath", "fileName", "content"]
 }
@@ -44,7 +44,7 @@ delete_file_req_schema = {
     "type": "object",
     "properties": {
         "filePath": {"type": "string"},
-        "fileName": {"type": "string"},
+        "fileName": {"type": "string"}
     },
     "required": ["filePath", "fileName"]
 }
@@ -211,11 +211,11 @@ def share_file():
     }
     """
     content = request.json
-    if not fileIsUnique(content["filePath"], content["fileName"]) and not content["forceOverwrite"]:
+    if not fileIsUnique(content["destinyUsername"] + "/shared", content["fileName"]) and not content["forceOverwrite"]:
         error = {"message": "Another file already exists at the shared folder of target user",
                  "requestOverwrite": True}
         return make_response(jsonify(error), 409)
-    if not spaceAvailableShareFile(content["destinyUsername"], content["filePath"] + "/" + content["fileName"]):
+    if not spaceAvailableShareFile(content["destinyUsername"], content["filePath"], content["fileName"]):
         error = {"message": "Sufficient space isn't available in target user shared directory",
                  "requestOverwrite": False}
         return make_response(jsonify(error), 409)
