@@ -52,8 +52,9 @@ post_vv_copy_dir_req_schema = {
         "dirPath": {"type": "string"},
         "dirName": {"type": "string"},
         "destinyPath": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
     },
-    "required": ["dirPath", "dirName", "destinyPath"]
+    "required": ["dirPath", "dirName", "destinyPath", "forceOverwrite"]
 }
 
 
@@ -199,7 +200,7 @@ def share_dir():
     return make_response(jsonify(resp), 200)
 
 
-# Route to make a vv copy of a file
+# Route to make a vv copy of a dir
 @app.route('/dirs/vvcopy', methods=['POST'])
 @expects_json(post_vv_copy_dir_req_schema)
 def vv_copy_dir():
@@ -208,21 +209,19 @@ def vv_copy_dir():
     {
         "dirName": String,
         "dirPath": String,
+        "requestOverwrite": Boolean
     }
     """
     content = request.json
-    original_dir_name = content["dirName"]
-    if not dirIsUnique(content["destinyPath"], content["dirName"]):
-        i = 1
-        while not dirIsUnique(content["destinyPath"], content["dirName"]):
-            content["dirName"] = content["dirName"] + f'({str(i)})'
-            i += 1
-    if not spaceAvailableShareDir(content["destinyPath"].split("/")[0], content["filePath"], original_dir_name):
-        error = {"message": "Sufficient space isn't available in the drive"}
+    if not dirIsUnique(content["destinyPath"], content["dirName"]) and not content["forceOverwrite"]:
+        error = {"message": "The given directory name already exists at target location", "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    if not spaceAvailableShareDir(content["destinyPath"].split("/")[0], content["dirPath"], content["dirName"]):
+        error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
     status = moveDir(content["dirPath"], content["dirName"], content["destinyPath"], True)
     if not status:
-        error = {"message": "The directory could not be copied"}
+        error = {"message": "The directory could not be copied", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
-    resp = {"dirName": content["dirName"], "dirPath": content["dirPath"]}
+    resp = {"dirName": content["dirName"], "dirPath": content["dirPath"], "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
