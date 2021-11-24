@@ -47,8 +47,13 @@
         <div class="title">
           <mat-icon> filter_drama </mat-icon><a> Storage </a>
         </div>
-        <mat-progress-bar mode="determinate" value="40"></mat-progress-bar>
-        <span class="label"> 200B out of 1000B used </span>
+        <mat-progress-bar
+          mode="determinate"
+          value="{{ getPercentageValue(space.usedSpace, space.totalSpace) }}"
+        ></mat-progress-bar>
+        <span class="label">
+          {{ space.usedSpace }}B out of {{ space.totalSpace }}B used
+        </span>
       </div>
     </nav>
   </div>

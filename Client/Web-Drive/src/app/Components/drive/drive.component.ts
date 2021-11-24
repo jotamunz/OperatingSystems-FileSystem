@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../../Services/authentication/authentication.service';
 import { DirectoryService } from '../../Services/directory/directory.service';
+import { DriveService } from '../../Services/drive/drive.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import Drive from '../../Models/drive.model';
 import Directory from '../../Models/directory.model';
 import File from '../../Models/file.model';
 import User from '../../Models/user.model';
+import Space from '../../Models/space.model';
 
 
 
@@ -16,12 +18,12 @@ import User from '../../Models/user.model';
   styleUrls: ['./drive.component.css']
 })
 export class DriveComponent implements OnInit {
-
   path: string[] = []; 
   files: File[] = [];
   directories : Directory[] = [];
   directory : Drive = {};
   user : User = {};
+  space : Space = {};
 
 
 
@@ -29,26 +31,40 @@ export class DriveComponent implements OnInit {
     private routerService: Router,
     private authenticationService: AuthenticationService,
     private dirService : DirectoryService,
+    private driveService : DriveService,
     private snackBar: MatSnackBar
     ) {}
 
   async ngOnInit(): Promise<void> {
     this.user = this.authenticationService.getUserInformation();
-    await this.getDir(this.user.username +'/root');
+    if(this.user.username != null){
+      await this.getDir(this.user.username +'/root');
     this.path.push('root');
+    this.getSpace(this.user.username);
+    } 
   }
 
+
+
+  /**
+   * 
+   * @returns used percentage
+   */
+ public getPercentageValue(usedSpace:any,totalSpace:any){
+   let percenatage = (usedSpace*100)/totalSpace;
+
+  return percenatage;
+}
 
 /**
    * Ends session
    * @returns void
    */
  public onClickLogout(){
-   this.user.allocatedBytes = 0;
-   this.user.password = '';
-   this.user.username = '';
-
-   this.authenticationService.setUserInformation(this.user);
+  this.user.allocatedBytes = 0;
+  this.user.password = '';
+  this.user.username = '';
+  this.authenticationService.setUserInformation(this.user);
   this.routerService.navigateByUrl('/');
 }
 
@@ -63,6 +79,18 @@ export class DriveComponent implements OnInit {
     });
     return path;
   }
+
+
+  
+/**
+   * Gets current space for the drive
+   * @returns void
+   */
+ public async getSpace(username:string){
+  if(this.user.username != null){
+    this.space = await this.driveService.getDriveSpace(this.user.username);
+  } 
+}
 
 
   /**
