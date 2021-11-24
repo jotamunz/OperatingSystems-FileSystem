@@ -8,6 +8,30 @@ def getDirContent(path):
     jsonObject = readJSON(folders[0])
     return getContentFromPath(folders, jsonObject)
 
+def getFileContent(path, name):
+    folders = path.split("/")
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    for file in directory["files"]:
+        if file["name"] == name:
+            return file["content"]
+    return ""
+
+def getFileProperties(path, name):
+    folders = path.split("/")
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    for file in directory["files"]:
+        if file["name"] == name:
+            return {
+                "name": file["name"],
+                "extension": file["extension"],
+                "creation": file["creation"],
+                "modification": file["modification"],
+                "size": file["size"]
+            }
+    return {}
+
 def isHomeDir(folders):
     if len(folders) <= 1:
         return True
@@ -45,10 +69,39 @@ def fileIsUnique(path, name):
             return False
     return True
 
-def spaceAvailable(path, content):
-    folders = path.split("/")
-    jsonObject = readJSON(folders[0])
+def spaceAvailableFile(path, content):
+    username = path.split("/")[0]
+    jsonObject = readJSON(username)
     return jsonObject["size"] >= jsonObject["used"] + len(content)
+
+def spaceAvailableShareFile(targetUser, sharingPath, sharingName):
+    jsonObject = readJSON(targetUser)
+    size = getFileProperties(sharingPath, sharingName)["size"]
+    return jsonObject["size"] >= jsonObject["used"] + size
+
+def getSizeOfDir(directory):
+    size = 0
+    for file in directory["files"]:
+        size += file["size"]
+    return size
+
+def recurseSizeOfDir(directory):
+    if len(directory["directories"]) == 0:
+        return getSizeOfDir(directory)
+    else:
+        size = 0
+        for subDir in directory["directories"]:
+            size += recurseSizeOfDir(subDir)
+        size += getSizeOfDir(directory)
+        return size
+
+def spaceAvailableShareDir(targetUser, sharingPath, sharingName):
+    jsonObject = readJSON(targetUser)
+    folders = sharingPath.split("/")
+    jsonSharingObject = readJSON(folders[0])
+    directory = getContentFromPath(folders + [sharingName], jsonSharingObject)
+    size = recurseSizeOfDir(directory)
+    return jsonObject["size"] >= jsonObject["used"] + size
 
 def createDir(path, name):
     folders = path.split("/")
@@ -117,11 +170,13 @@ def doAction(jsonObject, name, status, jsonHome, content=None, extension=None):
     match status:
         # Create a new directory
         case 0:
-            deleteDirByName(jsonObject, name)
+            size = deleteDirByName(jsonObject, name)
+            addSpace(jsonHome, -size)
             createDirByName(jsonObject, name)
         # Delete a directory
         case 1:
-            deleteDirByName(jsonObject, name)
+            size = deleteDirByName(jsonObject, name)
+            addSpace(jsonHome, -size)
         # Create a new file
         case 2:
             size = deleteFileByName(jsonObject, name)
@@ -142,8 +197,8 @@ def deleteDirByName(jsonObject, name):
     for i, directory in enumerate(jsonObject["directories"]):
         if directory["name"] == name:
             jsonObject["directories"].pop(i)
-            break
-    return
+            return recurseSizeOfDir(directory)
+    return 0
 
 def createDirByName(jsonObject, name):
     jsonObject["directories"].append({
@@ -151,7 +206,7 @@ def createDirByName(jsonObject, name):
         "directories": [],
         "files": []
     })
-    return
+    return 0
 
 def deleteFileByName(jsonObject, name):
     for i, file in enumerate(jsonObject["files"]):
@@ -185,6 +240,80 @@ def addSpace(jsonHome, space):
     jsonHome["used"] += space
     return
 
+def moveFile(path, name, newPath):
+    folders = path.split("/")
+    newFolders = newPath.split("/")
+    if isHomeDir(folders) or isHomeDir(newFolders):
+        return False
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    newDirectory = getContentFromPath(newFolders, jsonObject)
+    size = moveFileByName(directory, name, newDirectory, False)
+    addSpace(jsonObject, size)
+    writeJSON(jsonObject)
+    return True
 
+def moveDir(path, name, newPath):
+    folders = path.split("/")
+    newFolders = newPath.split("/")
+    if isHomeDir(folders) or isHomeDir(newFolders):
+        return False
+    jsonObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonObject)
+    newDirectory = getContentFromPath(newFolders, jsonObject)
+    size = moveDirByName(directory, name, newDirectory, False)
+    addSpace(jsonObject, size)
+    writeJSON(jsonObject)
+    return True
 
+def shareFile(path, name, newUser):
+    folders = path.split("/")
+    if isHomeDir(folders):
+        return False
+    jsonObject = readJSON(folders[0])
+    jsonNewUser = readJSON(newUser)
+    directory = getContentFromPath(folders, jsonObject)
+    newDirectory = jsonNewUser["shared"]
+    size = moveFileByName(directory, name, newDirectory, True)
+    addSpace(jsonNewUser, size)
+    writeJSON(jsonObject)
+    writeJSON(jsonNewUser)
+    return True
 
+def shareDir(path, name, newUser):
+    folders = path.split("/")
+    if isHomeDir(folders):
+        return False
+    jsonObject = readJSON(folders[0])
+    jsonNewUser = readJSON(newUser)
+    directory = getContentFromPath(folders, jsonObject)
+    newDirectory = jsonNewUser["shared"]
+    size = moveDirByName(directory, name, newDirectory, True)
+    addSpace(jsonNewUser, size)
+    writeJSON(jsonObject)
+    writeJSON(jsonNewUser)
+    return True
+
+def moveFileByName(directory, name, newDirectory, isShare):
+    for i, file in enumerate(directory["files"]):
+        if file["name"] == name:
+            sizeDif = deleteFileByName(newDirectory, name)
+            newDirectory["files"].append(file)
+            if not isShare:
+                directory["files"].pop(i)
+            else:
+                sizeDif = file["size"] - sizeDif
+            return sizeDif
+    return 0
+
+def moveDirByName(directory, name, newDirectory, isShare):
+    for i, subDir in enumerate(directory["directories"]):
+        if subDir["name"] == name:
+            sizeDif = deleteDirByName(newDirectory, name)
+            newDirectory["directories"].append(subDir)
+            if not isShare:
+                directory["directories"].pop(i)
+            else:
+                sizeDif = recurseSizeOfDir(subDir) - sizeDif
+            return sizeDif
+    return 0
