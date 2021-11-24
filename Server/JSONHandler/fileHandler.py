@@ -74,6 +74,10 @@ def spaceAvailableFile(path, content):
     jsonObject = readJSON(username)
     return jsonObject["size"] >= jsonObject["used"] + len(content)
 
+def spaceAvailableShareFile(path, sharingPath):
+    # TO DO
+    return True
+
 def getSizeOfDir(directory):
     size = 0
     for file in directory["files"]:
@@ -90,7 +94,7 @@ def recurseSizeOfDir(directory):
         size += getSizeOfDir(directory)
         return size
 
-def spaceAvailableDir(path, sharingPath):
+def spaceAvailableShareDir(path, sharingPath):
     username = path.split("/")[0]
     jsonObject = readJSON(username)
     folders = sharingPath.split("/")
