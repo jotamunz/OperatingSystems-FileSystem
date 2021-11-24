@@ -74,9 +74,10 @@ def spaceAvailableFile(path, content):
     jsonObject = readJSON(username)
     return jsonObject["size"] >= jsonObject["used"] + len(content)
 
-def spaceAvailableShareFile(username, sharingPath):
-    # TO DO
-    return True
+def spaceAvailableShareFile(targetUser, sharingPath, sharingName):
+    jsonObject = readJSON(targetUser)
+    size = getFileProperties(sharingPath, sharingName)["size"]
+    return jsonObject["size"] >= jsonObject["used"] + size
 
 def getSizeOfDir(directory):
     size = 0
@@ -94,11 +95,11 @@ def recurseSizeOfDir(directory):
         size += getSizeOfDir(directory)
         return size
 
-def spaceAvailableShareDir(username, sharingPath):
-    jsonObject = readJSON(username)
+def spaceAvailableShareDir(targetUser, sharingPath, sharingName):
+    jsonObject = readJSON(targetUser)
     folders = sharingPath.split("/")
     jsonSharingObject = readJSON(folders[0])
-    directory = getContentFromPath(folders, jsonSharingObject)
+    directory = getContentFromPath(folders + [sharingName], jsonSharingObject)
     size = recurseSizeOfDir(directory)
     return jsonObject["size"] >= jsonObject["used"] + size
 
