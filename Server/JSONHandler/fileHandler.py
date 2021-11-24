@@ -23,13 +23,7 @@ def getFileProperties(path, name):
     directory = getContentFromPath(folders, jsonObject)
     for file in directory["files"]:
         if file["name"] == name:
-            return {
-                "name": file["name"],
-                "extension": file["extension"],
-                "creation": file["creation"],
-                "modification": file["modification"],
-                "size": file["size"]
-            }
+            return file
     return {}
 
 def isHomeDir(folders):
