@@ -44,6 +44,16 @@ def nameIsValid(name):
     invalidChars = set(string.punctuation.replace(" ", ""))
     return not any(char in invalidChars for char in name)
 
+def getContentNamesFisical(directory):
+    names = []
+    for filename in os.listdir(directory):
+        file = os.path.join(directory, filename)
+        if os.path.isfile(file):
+            base = os.path.basename(file)
+            fileName = os.path.splitext(base)[0]
+            names += fileName
+    return names
+
 def homeDirectory(username):
     return {
         "name": username,
