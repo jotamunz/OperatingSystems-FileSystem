@@ -18,7 +18,9 @@
         <mat-icon> add_box </mat-icon> <span>Add</span>
       </button>
       <mat-menu #menu="matMenu">
-        <button mat-menu-item><mat-icon> folder </mat-icon> Carpeta</button>
+        <button (click)="this.openCreateDirectoryDialog()" mat-menu-item>
+          <mat-icon> folder </mat-icon> Carpeta
+        </button>
         <button mat-menu-item><mat-icon> article </mat-icon>Archivo</button>
         <button mat-menu-item>
           <mat-icon> upload_file </mat-icon>Subir Archivo
