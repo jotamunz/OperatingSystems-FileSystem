@@ -60,7 +60,16 @@ export class DriveComponent implements OnInit {
    * Opens the dialog for creating a new directory
    */
   public openCreateDirectoryDialog(): void {
-    this.dialog.open(CreateDirectoryComponent, { width: '500px' });
+    const createDirectoryDialog = this.dialog.open(CreateDirectoryComponent, {
+      width: '500px',
+    });
+    createDirectoryDialog
+      .afterClosed()
+      .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
+        if (shouldDirectoriesGetRefreshed) {
+          await this.getDir(this.getCurrentPath());
+        }
+      });
   }
 
   /**
