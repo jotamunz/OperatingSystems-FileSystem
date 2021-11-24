@@ -44,6 +44,7 @@ export class DriveComponent implements OnInit {
     if (this.user.username != null) {
       await this.getDir(this.user.username + '/root');
       this.path.push('root');
+      this.driveService.appendDirectoryToPath('root');
       this.getSpace(this.user.username);
     }
   }
@@ -123,6 +124,7 @@ export class DriveComponent implements OnInit {
    */
   public async onClickChangeDirForward(path: any) {
     this.path.push(path);
+    this.driveService.appendDirectoryToPath(path);
     await this.getDir(this.getCurrentPath() + path);
   }
 
@@ -133,6 +135,9 @@ export class DriveComponent implements OnInit {
   public async onClickChangeDirBackward(path: any) {
     let index = this.path.indexOf(path);
     this.path = this.path.slice(0, index + 1);
+    this.driveService.setCurrentPath(
+      this.driveService.getCurrentPath().slice(0, index + 1)
+    );
     await this.getDir(this.getCurrentPath());
   }
 

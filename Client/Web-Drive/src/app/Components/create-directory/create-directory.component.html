@@ -3,7 +3,10 @@
   <form (ngSubmit)="this.onSubmit()" class="example-form">
     <mat-form-field class="form-control" appearance="fill">
       <mat-label>Nombre de la carpeta</mat-label>
-      <input matInput />
+      <input name="directoryName" [(ngModel)]="this.directoryName" matInput />
+      <mat-error *ngIf="directoryNameFormControl.hasError('required')">
+        Nombre del directorio es <strong>requerido</strong>
+      </mat-error>
     </mat-form-field>
     <button type="submit" class="submit-btn" mat-flat-button color="primary">
       Crear carpeta
