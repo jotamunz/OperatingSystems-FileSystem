@@ -3,7 +3,7 @@ from HTTPServer import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
 from JSONHandler.fileHandler import fileIsUnique, spaceAvailable, createFile, deleteFile, modifyFile, \
-    getFileContent, getFileProperties, moveFile
+    getFileContent, getFileProperties, moveFile, shareFile
 
 # Request schemas
 
@@ -206,13 +206,24 @@ def share_file():
     """
     response:
     {
-        "sourceUsername": String
         "destinyUsername": String,
         "sharedFileName": String
 
     }
     """
     content = request.json
-    resp = {"sourceUsername": content[""], "destinyUsername": content[""],
-            "sharedFileName": content[""]}
+    if not fileIsUnique(content["filePath"], content["fileName"]) and not content["forceOverwrite"]:
+        error = {"message": "Another file already exists at the shared folder of target user",
+                 "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    if not spaceAvailable(content["destinyUsername"] + "\\shared", content["fileName"]):
+        error = {"message": "Sufficient space isn't available in target user shared directory",
+                 "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    status = shareFile(content["filePath"], content["fileName"], content["destinyUsername"])
+    if not status:
+        error = {"message": "The file could not be shared", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"destinyUsername": content["destinyUsername"], "sharedFileName": content["fileName"],
+            "requestOverwrite": False}
     return make_response(jsonify(resp), 200)

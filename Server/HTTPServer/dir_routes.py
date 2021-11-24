@@ -150,7 +150,7 @@ def move_dir():
         error = {"message": "Another directory already exists at the shared directory of the target user",
                  "requestOverwrite": True}
         return make_response(jsonify(error), 409)
-    status = False
+    status = moveDir(content["dirPath"], content["dirName"], content["destinyPath"])
     if not status:
         error = {"message": "The directory could not be moved", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
