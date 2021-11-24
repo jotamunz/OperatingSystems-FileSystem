@@ -56,3 +56,9 @@ def login(username, password):
 def getSpace(username):
     jsonObject = readJSON(username)
     return jsonObject["size"], jsonObject["used"]
+
+def getUsers():
+    currentDir = os.path.dirname(__file__)
+    drivesDir = os.path.join(currentDir, '..', 'Drives')
+    users = getContentNamesFisical(drivesDir)
+    return {"users": users}
