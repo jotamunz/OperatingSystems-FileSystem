@@ -1,7 +1,8 @@
 <div class="container">
-  <div class="login">
-    <div class="login-input">
-      <h1><mat-icon>lock</mat-icon> Sign In</h1>
+  <div class="wallpaper"></div>
+  <div class="sign-up">
+    <h1>Sign-Up</h1>
+    <div class="sign-up-input">
       <!-- Input for Username -->
       <mat-form-field class="form-field" appearance="fill">
         <mat-label>Username</mat-label>
@@ -12,7 +13,7 @@
           [(ngModel)]="user.username"
         />
 
-        <!-- Validations -->
+        <!-- Validators -->
         <mat-error *ngIf="loginFormControl.hasError('required')">
           Username is <strong>required</strong>
         </mat-error>
@@ -29,7 +30,7 @@
         </button>
       </mat-form-field>
 
-      <!-- Input for password -->
+      <!-- Input for Password -->
       <mat-form-field class="form-field" appearance="fill">
         <mat-label>Password</mat-label>
         <input
@@ -39,7 +40,7 @@
           [(ngModel)]="user.password"
         />
 
-        <!-- Validations -->
+        <!-- Validators -->
         <mat-error *ngIf="passwordFormControl.hasError('required')">
           Password is <strong>required</strong>
         </mat-error>
@@ -56,19 +57,27 @@
         </button>
       </mat-form-field>
 
-      <!-- Interaction Buttons -->
-      <div class="login-buttons">
-        <a (click)="openDialog()">Register</a>
-        <a href="#">Forgot Password?</a>
-        <button
-          (click)="this.onSignInClick()"
-          mat-raised-button
-          color="primary"
-        >
-          Sign-In
-        </button>
-      </div>
+      <!-- Input for byte Size -->
+      <mat-form-field class="form-field" appearance="fill">
+        <mat-label>Size</mat-label>
+        <input
+          matInput
+          type="number"
+          [formControl]="sizeFormControl"
+          [(ngModel)]="user.allocatedBytes"
+        />
+        <span matSuffix>bytes</span>
+
+        <!-- Validators -->
+        <mat-error *ngIf="sizeFormControl.hasError('required')">
+          Size is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Sign-In Button -->
+      <button (click)="onSignUpClick()" mat-raised-button color="primary">
+        Sign Up
+      </button>
     </div>
   </div>
-  <div class="wallpaper"></div>
 </div>

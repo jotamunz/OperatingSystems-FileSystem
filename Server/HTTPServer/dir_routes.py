@@ -19,7 +19,7 @@ delete_dir_req_schema = {
     "type": "object",
     "properties": {
         "dirPath": {"type": "string"},
-        "dirName": {"type": "string"},
+        "dirName": {"type": "string"}
     },
     "required": ["dirPath", "dirName"]
 }
@@ -46,6 +46,17 @@ post_share_dir_req_schema = {
     "required": ["dirPath", "dirName", "destinyUsername", "forceOverwrite"]
 }
 
+post_vv_copy_dir_req_schema = {
+    "type": "object",
+    "properties": {
+        "dirPath": {"type": "string"},
+        "dirName": {"type": "string"},
+        "destinyPath": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
+    },
+    "required": ["dirPath", "dirName", "destinyPath", "forceOverwrite"]
+}
+
 
 # Routes
 # Route to get a specific dir of an user
@@ -62,7 +73,7 @@ def get_dir():
                 {
                     "name": String,
                     "directories": Array,
-                    "files": String
+                    "files": Array
                 }
             ]
             "files" [
@@ -98,7 +109,7 @@ def post_dir():
     response:
     {
         "dirName": String,
-        "path": String,
+        "dirPath": String,
         "requestOverwrite": Boolean
     }
     """
@@ -110,7 +121,7 @@ def post_dir():
     if not status:
         error = {"message": "The given directory name is invalid, please try another", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
-    resp = {"dirName": content["dirName"], "path": content["newDirPath"], "requestOverwrite": False}
+    resp = {"dirName": content["dirName"], "dirPath": content["newDirPath"], "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
 
 
@@ -172,11 +183,11 @@ def share_dir():
     }
     """
     content = request.json
-    if not dirIsUnique(content["dirPath"], content["dirName"]) and not content["forceOverwrite"]:
+    if not dirIsUnique(content["destinyUsername"] + "/shared", content["dirName"]) and not content["forceOverwrite"]:
         error = {"message": "Another directory already exists at the shared folder of target user",
                  "requestOverwrite": True}
         return make_response(jsonify(error), 409)
-    if not spaceAvailableShareDir(content["destinyUsername"], content["dirPath"] + "/" + content["dirName"]):
+    if not spaceAvailableShareDir(content["destinyUsername"], content["dirPath"], content["dirName"]):
         error = {"message": "Sufficient space isn't available in target user shared directory",
                  "requestOverwrite": False}
         return make_response(jsonify(error), 409)
@@ -186,4 +197,31 @@ def share_dir():
         return make_response(jsonify(error), 409)
     resp = {"destinyUsername": content["destinyUsername"], "sharedFileName": content["dirName"],
             "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to make a vv copy of a dir
+@app.route('/dirs/vvcopy', methods=['POST'])
+@expects_json(post_vv_copy_dir_req_schema)
+def vv_copy_dir():
+    """
+    response:
+    {
+        "dirName": String,
+        "dirPath": String,
+        "requestOverwrite": Boolean
+    }
+    """
+    content = request.json
+    if not dirIsUnique(content["destinyPath"], content["dirName"]) and not content["forceOverwrite"]:
+        error = {"message": "The given directory name already exists at target location", "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    if not spaceAvailableShareDir(content["destinyPath"].split("/")[0], content["dirPath"], content["dirName"]):
+        error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    status = moveDir(content["dirPath"], content["dirName"], content["destinyPath"], True)
+    if not status:
+        error = {"message": "The directory could not be copied", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"dirName": content["dirName"], "dirPath": content["dirPath"], "requestOverwrite": False}
     return make_response(jsonify(resp), 200)

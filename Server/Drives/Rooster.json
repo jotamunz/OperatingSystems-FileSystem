@@ -1,0 +1,84 @@
+{
+    "user": "Rooster",
+    "password": "contra",
+    "size": 1024,
+    "used": 98,
+    "root": {
+        "name": "root",
+        "directories": [
+            {
+                "name": "Peliculas",
+                "directories": [
+                    {
+                        "name": "Videos",
+                        "directories": [],
+                        "files": [
+                            {
+                                "name": "HolaGerman",
+                                "extension": "txt",
+                                "creation": "2021-11-23T23:42:24.895424",
+                                "modification": "2021-11-23T23:42:24.895424",
+                                "size": 15,
+                                "content": "Hola soy german"
+                            },
+                            {
+                                "name": "Auron",
+                                "extension": "txt",
+                                "creation": "2021-11-23T23:42:40.882400",
+                                "modification": "2021-11-23T23:49:10.603806",
+                                "size": 13,
+                                "content": "Tomen zumitos"
+                            }
+                        ]
+                    }
+                ],
+                "files": [
+                    {
+                        "name": "BeeMovie",
+                        "extension": "txt",
+                        "creation": "2021-11-23T23:41:15.565978",
+                        "modification": "2021-11-23T23:41:15.565978",
+                        "size": 29,
+                        "content": "La pelicula de la super abeja"
+                    },
+                    {
+                        "name": "Auron",
+                        "extension": "txt",
+                        "creation": "2021-11-23T23:42:40.882400",
+                        "modification": "2021-11-23T23:49:10.603806",
+                        "size": 13,
+                        "content": "Tomen zumitos"
+                    }
+                ]
+            },
+            {
+                "name": "Videos",
+                "directories": [],
+                "files": [
+                    {
+                        "name": "HolaGerman",
+                        "extension": "txt",
+                        "creation": "2021-11-23T23:42:24.895424",
+                        "modification": "2021-11-23T23:42:24.895424",
+                        "size": 15,
+                        "content": "Hola soy german"
+                    },
+                    {
+                        "name": "Auron",
+                        "extension": "txt",
+                        "creation": "2021-11-23T23:42:40.882400",
+                        "modification": "2021-11-23T23:49:10.603806",
+                        "size": 13,
+                        "content": "Tomen zumitos"
+                    }
+                ]
+            }
+        ],
+        "files": []
+    },
+    "shared": {
+        "name": "shared",
+        "directories": [],
+        "files": []
+    }
+}
