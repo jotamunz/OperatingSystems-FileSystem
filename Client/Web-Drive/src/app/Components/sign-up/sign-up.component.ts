@@ -52,15 +52,18 @@ export class SignUpComponent implements OnInit {
         });
         return;
       }
-      const createdUser: User = await this.authenticationService.registerUser({
+      await this.authenticationService.registerUser({
         ...this.user,
         requestedBytes: this.user.allocatedBytes,
       });
       // Store user profile information
       this.authenticationService.setIsAuthenticated(true);
-      this.authenticationService.setUserInformation(createdUser);
+      this.authenticationService.setUserInformation({
+        username: this.user.username,
+        allocatedBytes: this.user.allocatedBytes,
+      });
       // Access drive
-      this.snackBar.open(`Welcome ${createdUser.username}!`, 'Close', {
+      this.snackBar.open(`Welcome ${this.user.username}!`, 'Close', {
         verticalPosition: 'top',
         duration: 3000,
       });
