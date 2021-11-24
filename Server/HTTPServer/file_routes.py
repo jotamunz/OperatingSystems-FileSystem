@@ -2,8 +2,8 @@
 from HTTPServer import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-from JSONHandler.fileHandler import fileIsUnique, spaceAvailable, createFile, deleteFile, modifyFile, \
-    getFileContent, getFileProperties, moveFile, shareFile
+from JSONHandler.fileHandler import fileIsUnique, spaceAvailableShareFile, createFile, deleteFile, modifyFile, \
+    getFileContent, getFileProperties, moveFile, shareFile, spaceAvailableFile
 
 # Request schemas
 
@@ -39,7 +39,6 @@ post_move_file_req_schema = {
     },
     "required": ["filePath", "fileName", "destinyPath", "forceOverwrite"]
 }
-
 
 delete_file_req_schema = {
     "type": "object",
@@ -121,7 +120,7 @@ def post_file():
     if not fileIsUnique(content["filePath"], content["newFileName"]) and not content["forceOverwrite"]:
         error = {"message": "The given file name already exists", "requestOverwrite": True}
         return make_response(jsonify(error), 409)
-    if not spaceAvailable(content["filePath"], content["newFileName"]):
+    if not spaceAvailableFile(content["filePath"], content["newFileName"]):
         error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
     status = createFile(content["filePath"], content["newFileName"], content["extension"], content["content"])
@@ -168,7 +167,7 @@ def modify_file():
     }
     """
     content = request.json
-    if not spaceAvailable(content["filePath"], content["fileName"]):
+    if not spaceAvailableFile(content["filePath"], content["fileName"]):
         error = {"message": "Sufficient space isn't available in Drive", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
     status = modifyFile(content["filePath"], content["fileName"], content["content"])
@@ -216,7 +215,7 @@ def share_file():
         error = {"message": "Another file already exists at the shared folder of target user",
                  "requestOverwrite": True}
         return make_response(jsonify(error), 409)
-    if not spaceAvailable(content["destinyUsername"] + "\\shared", content["fileName"]):
+    if not spaceAvailableShareFile(content["destinyUsername"], content["filePath"] + "/" + content["fileName"]):
         error = {"message": "Sufficient space isn't available in target user shared directory",
                  "requestOverwrite": False}
         return make_response(jsonify(error), 409)

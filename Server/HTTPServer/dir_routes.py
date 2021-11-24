@@ -1,7 +1,8 @@
 # Imports
 from HTTPServer import app
 from flask import request, jsonify, make_response
-from JSONHandler.fileHandler import getDirContent, createDir, dirIsUnique, deleteDir, moveDir
+from JSONHandler.fileHandler import getDirContent, createDir, dirIsUnique, deleteDir, moveDir, spaceAvailableShareDir, \
+    shareDir
 from flask_expects_json import expects_json
 
 post_dir_req_schema = {
@@ -171,6 +172,18 @@ def share_dir():
     }
     """
     content = request.json
-    resp = {"sourceUsername": content["sourceUsername"], "destinyUsername": content["destinyUsername"],
-            "sharedDirName": content["dirPath"]}
+    if not dirIsUnique(content["dirPath"], content["dirName"]) and not content["forceOverwrite"]:
+        error = {"message": "Another directory already exists at the shared folder of target user",
+                 "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    if not spaceAvailableShareDir(content["destinyUsername"], content["dirPath"] + "/" + content["dirName"]):
+        error = {"message": "Sufficient space isn't available in target user shared directory",
+                 "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    status = shareDir(content["dirPath"], content["dirName"], content["destinyUsername"])
+    if not status:
+        error = {"message": "The directory could not be shared", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"destinyUsername": content["destinyUsername"], "sharedFileName": content["dirName"],
+            "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
