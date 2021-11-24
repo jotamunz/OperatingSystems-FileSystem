@@ -21,4 +21,8 @@ export class FileService {
  public getFile(path: string,fileName: string): Promise<any>{
   return lastValueFrom(this.httpClient.get('/api/files?filePath='+path+'&fileName='+fileName+'&contentOnly=false'));
 }
+
+public modifyFile(file: any): Promise<any>{
+  return lastValueFrom(this.httpClient.post('/api/files/modify',file));
+}
 }

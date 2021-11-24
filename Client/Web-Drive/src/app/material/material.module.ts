@@ -8,6 +8,7 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatListModule } from '@angular/material/list'
 
 
 const MaterialComponents = [
@@ -21,6 +22,7 @@ const MaterialComponents = [
   MatProgressBarModule,
   MatCardModule,
   MatMenuModule,
+  MatListModule,
 ];
 
 @NgModule({

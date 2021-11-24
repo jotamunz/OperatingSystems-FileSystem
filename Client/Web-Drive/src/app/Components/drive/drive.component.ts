@@ -53,8 +53,11 @@ export class DriveComponent implements OnInit {
   /**
    * Opens the signup dialog
    */
-   public openDialog(): void {
-    this.dialog.open(FileViewComponent);
+   public openDialog(file: File): void {
+    let dialogRef = this.dialog.open(FileViewComponent);
+    dialogRef.componentInstance.file = file;
+    dialogRef.componentInstance.path = this.path;
+    dialogRef.componentInstance.user = this.user;
   }
 
   /**
@@ -109,9 +112,7 @@ export class DriveComponent implements OnInit {
    */
  public async getFile(filename:any){
     let file = await this.fileService.getFile(this.getCurrentPath(),filename);
-    console.log(file);
-    this.openDialog();
-    return file;
+    this.openDialog(file);
 }
 
   /**
