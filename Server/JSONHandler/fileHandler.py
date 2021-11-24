@@ -69,10 +69,35 @@ def fileIsUnique(path, name):
             return False
     return True
 
-def spaceAvailable(path, content):
+def spaceAvailableFile(path, content):
     folders = path.split("/")
     jsonObject = readJSON(folders[0])
     return jsonObject["size"] >= jsonObject["used"] + len(content)
+
+def getSizeOfDir(directory):
+    size = 0
+    for file in directory["files"]:
+        size += file["size"]
+    return size
+
+def recurseSizeOfDir(directory):
+    if len(directory["directories"]) == 0:
+        return getSizeOfDir(directory)
+    else:
+        size = 0
+        for subDir in directory["directories"]:
+            size += recurseSizeOfDir(subDir)
+        size += getSizeOfDir(directory)
+        return size
+
+def spaceAvailableDir(path, sharingPath):
+    username = path.split("/")[0]
+    jsonObject = readJSON(username)
+    folders = sharingPath.split("/")
+    jsonSharingObject = readJSON(folders[0])
+    directory = getContentFromPath(folders, jsonSharingObject)
+    size = recurseSizeOfDir(directory)
+    return jsonObject["size"] >= jsonObject["used"] + size
 
 def createDir(path, name):
     folders = path.split("/")
@@ -141,11 +166,13 @@ def doAction(jsonObject, name, status, jsonHome, content=None, extension=None):
     match status:
         # Create a new directory
         case 0:
-            deleteDirByName(jsonObject, name)
+            size = deleteDirByName(jsonObject, name)
+            addSpace(jsonHome, -size)
             createDirByName(jsonObject, name)
         # Delete a directory
         case 1:
-            deleteDirByName(jsonObject, name)
+            size = deleteDirByName(jsonObject, name)
+            addSpace(jsonHome, -size)
         # Create a new file
         case 2:
             size = deleteFileByName(jsonObject, name)
@@ -166,8 +193,8 @@ def deleteDirByName(jsonObject, name):
     for i, directory in enumerate(jsonObject["directories"]):
         if directory["name"] == name:
             jsonObject["directories"].pop(i)
-            break
-    return
+            return recurseSizeOfDir(directory)
+    return 0
 
 def createDirByName(jsonObject, name):
     jsonObject["directories"].append({
@@ -175,7 +202,7 @@ def createDirByName(jsonObject, name):
         "directories": [],
         "files": []
     })
-    return
+    return 0
 
 def deleteFileByName(jsonObject, name):
     for i, file in enumerate(jsonObject["files"]):
@@ -217,13 +244,10 @@ def moveFile(path, name, newPath):
     jsonObject = readJSON(folders[0])
     directory = getContentFromPath(folders, jsonObject)
     newDirectory = getContentFromPath(newFolders, jsonObject)
-    for i, file in enumerate(directory["files"]):
-        if file["name"] == name:
-            directory["files"].pop(i)
-            newDirectory["files"].append(file)
-            writeJSON(jsonObject)
-            return True
-    return False
+    size = moveFileByName(directory, name, newDirectory, False)
+    addSpace(jsonObject, size)
+    writeJSON(jsonObject)
+    return True
 
 def moveDir(path, name, newPath):
     folders = path.split("/")
@@ -233,10 +257,59 @@ def moveDir(path, name, newPath):
     jsonObject = readJSON(folders[0])
     directory = getContentFromPath(folders, jsonObject)
     newDirectory = getContentFromPath(newFolders, jsonObject)
+    size = moveDirByName(directory, name, newDirectory, False)
+    addSpace(jsonObject, size)
+    writeJSON(jsonObject)
+    return True
+
+def shareFile(path, name, newUser):
+    folders = path.split("/")
+    if isHomeDir(folders):
+        return False
+    jsonObject = readJSON(folders[0])
+    jsonNewUser = readJSON(newUser)
+    directory = getContentFromPath(folders, jsonObject)
+    newDirectory = jsonNewUser["shared"]
+    size = moveFileByName(directory, name, newDirectory, True)
+    addSpace(jsonNewUser, size)
+    writeJSON(jsonObject)
+    writeJSON(jsonNewUser)
+    return True
+
+def shareDir(path, name, newUser):
+    folders = path.split("/")
+    if isHomeDir(folders):
+        return False
+    jsonObject = readJSON(folders[0])
+    jsonNewUser = readJSON(newUser)
+    directory = getContentFromPath(folders, jsonObject)
+    newDirectory = jsonNewUser["shared"]
+    size = moveDirByName(directory, name, newDirectory, True)
+    addSpace(jsonNewUser, size)
+    writeJSON(jsonObject)
+    writeJSON(jsonNewUser)
+    return True
+
+def moveFileByName(directory, name, newDirectory, isShare):
+    for i, file in enumerate(directory["files"]):
+        if file["name"] == name:
+            sizeDif = deleteFileByName(newDirectory, name)
+            newDirectory["files"].append(file)
+            if not isShare:
+                directory["files"].pop(i)
+            else:
+                sizeDif = file["size"] - sizeDif
+            return sizeDif
+    return 0
+
+def moveDirByName(directory, name, newDirectory, isShare):
     for i, subDir in enumerate(directory["directories"]):
         if subDir["name"] == name:
-            directory["directories"].pop(i)
+            sizeDif = deleteDirByName(newDirectory, name)
             newDirectory["directories"].append(subDir)
-            writeJSON(jsonObject)
-            return True
-    return False
+            if not isShare:
+                directory["directories"].pop(i)
+            else:
+                sizeDif = recurseSizeOfDir(subDir) - sizeDif
+            return sizeDif
+    return 0
