@@ -70,8 +70,8 @@ def fileIsUnique(path, name):
     return True
 
 def spaceAvailableFile(path, content):
-    folders = path.split("/")
-    jsonObject = readJSON(folders[0])
+    username = path.split("/")[0]
+    jsonObject = readJSON(username)
     return jsonObject["size"] >= jsonObject["used"] + len(content)
 
 def getSizeOfDir(directory):
