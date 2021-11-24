@@ -6,7 +6,7 @@ import { DriveService } from '../../Services/drive/drive.service';
 import { FileService } from '../../Services/file/file.service';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FileViewComponent } from '../file-view/file-view.component';
 import { CreateDirectoryComponent } from '../create-directory/create-directory.component';
 
@@ -15,6 +15,7 @@ import Directory from '../../Models/directory.model';
 import File from '../../Models/file.model';
 import User from '../../Models/user.model';
 import Space from '../../Models/space.model';
+import { CreateFileComponent } from '../create-file/create-file.component';
 
 @Component({
   selector: 'app-drive',
@@ -167,10 +168,28 @@ export class DriveComponent implements OnInit {
    * Opens the dialog for creating a new directory
    */
   public openCreateDirectoryDialog(): void {
-    const createDirectoryDialog = this.dialog.open(CreateDirectoryComponent, {
-      width: '500px',
-    });
+    const createDirectoryDialog: MatDialogRef<CreateDirectoryComponent> =
+      this.dialog.open(CreateDirectoryComponent, {
+        width: '500px',
+      });
     createDirectoryDialog
+      .afterClosed()
+      .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
+        if (shouldDirectoriesGetRefreshed) {
+          await this.getDir(this.getCurrentPath());
+        }
+      });
+  }
+
+  /**
+   * Opens the dialog for creating a new directory
+   */
+  public openCreateFileDialog(): void {
+    const createFileDialog: MatDialogRef<CreateFileComponent> =
+      this.dialog.open(CreateFileComponent, {
+        width: '600px',
+      });
+    createFileDialog
       .afterClosed()
       .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
         if (shouldDirectoriesGetRefreshed) {
