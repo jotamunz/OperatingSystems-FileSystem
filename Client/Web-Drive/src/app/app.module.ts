@@ -11,9 +11,10 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './Components/login/login.component';
 import { SignUpComponent } from './Components/sign-up/sign-up.component';
 import { DriveComponent } from './Components/drive/drive.component';
+import { FileViewComponent } from './Components/file-view/file-view.component';
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, SignUpComponent, DriveComponent],
+  declarations: [AppComponent, LoginComponent, SignUpComponent, DriveComponent, FileViewComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

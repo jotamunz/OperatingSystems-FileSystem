@@ -117,7 +117,12 @@
         <h2>Files</h2>
         <div class="files">
           <!-- Button for File -->
-          <button mat-flat-button class="file" *ngFor="let file of files">
+          <button
+            mat-flat-button
+            class="file"
+            *ngFor="let file of files"
+            (click)="getFile(file.name)"
+          >
             <mat-icon> article </mat-icon>
             <span>{{ file.name }}</span>
           </button>
