@@ -90,7 +90,7 @@ def get_file():
         "content": String
     }
     if content = true, only the content field will be sent,
-    otherwise route will respond with file properties fields only
+    otherwise response will include all fields
     """
     file_path = request.args.get('filePath')
     if file_path is None:
