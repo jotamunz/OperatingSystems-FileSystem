@@ -67,7 +67,7 @@ post_vv_copy_file_req_schema = {
         "fileName": {"type": "string"},
         "destinyPath": {"type": "string"},
     },
-    "required": ["filePath", "fileName", "destinyPath", "forceOverwrite"]
+    "required": ["filePath", "fileName", "destinyPath"]
 }
 
 
@@ -238,17 +238,6 @@ def share_file():
     return make_response(jsonify(resp), 200)
 
 
-post_vv_copy_file_req_schema = {
-    "type": "object",
-    "properties": {
-        "filePath": {"type": "string"},
-        "fileName": {"type": "string"},
-        "destinyPath": {"type": "string"},
-    },
-    "required": ["filePath", "fileName", "destinyPath", "forceOverwrite"]
-}
-
-
 # Route to make a vv copy of a file
 @app.route('/files/vvcopy', methods=['POST'])
 @expects_json(post_vv_copy_file_req_schema)
@@ -261,12 +250,13 @@ def vv_copy_file():
     }
     """
     content = request.json
+    original_file_name = content["fileName"]
     if not fileIsUnique(content["destinyPath"], content["fileName"]):
         i = 1
         while not fileIsUnique(content["destinyPath"], content["fileName"]):
             content["fileName"] = content["fileName"] + f'({str(i)})'
             i += 1
-    if not spaceAvailableShareFile(content["destinyPath"].split("/")[0], content["destinyPath"], content["fileName"]):
+    if not spaceAvailableShareFile(content["destinyPath"].split("/")[0], content["filePath"], original_file_name):
         error = {"message": "Sufficient space isn't available in the drive"}
         return make_response(jsonify(error), 409)
     status = moveFile(content["filePath"], content["fileName"], content["destinyPath"], True)

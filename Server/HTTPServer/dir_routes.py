@@ -46,6 +46,16 @@ post_share_dir_req_schema = {
     "required": ["dirPath", "dirName", "destinyUsername", "forceOverwrite"]
 }
 
+post_vv_copy_dir_req_schema = {
+    "type": "object",
+    "properties": {
+        "dirPath": {"type": "string"},
+        "dirName": {"type": "string"},
+        "destinyPath": {"type": "string"},
+    },
+    "required": ["dirPath", "dirName", "destinyPath"]
+}
+
 
 # Routes
 # Route to get a specific dir of an user
@@ -186,4 +196,33 @@ def share_dir():
         return make_response(jsonify(error), 409)
     resp = {"destinyUsername": content["destinyUsername"], "sharedFileName": content["dirName"],
             "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to make a vv copy of a file
+@app.route('/dirs/vvcopy', methods=['POST'])
+@expects_json(post_vv_copy_dir_req_schema)
+def vv_copy_dir():
+    """
+    response:
+    {
+        "dirName": String,
+        "dirPath": String,
+    }
+    """
+    content = request.json
+    original_dir_name = content["dirName"]
+    if not dirIsUnique(content["destinyPath"], content["dirName"]):
+        i = 1
+        while not dirIsUnique(content["destinyPath"], content["dirName"]):
+            content["dirName"] = content["dirName"] + f'({str(i)})'
+            i += 1
+    if not spaceAvailableShareDir(content["destinyPath"].split("/")[0], content["filePath"], original_dir_name):
+        error = {"message": "Sufficient space isn't available in the drive"}
+        return make_response(jsonify(error), 409)
+    status = moveDir(content["dirPath"], content["dirName"], content["destinyPath"], True)
+    if not status:
+        error = {"message": "The directory could not be copied"}
+        return make_response(jsonify(error), 409)
+    resp = {"dirName": content["dirName"], "dirPath": content["dirPath"]}
     return make_response(jsonify(resp), 200)
