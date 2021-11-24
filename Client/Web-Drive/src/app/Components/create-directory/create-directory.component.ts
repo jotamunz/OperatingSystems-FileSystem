@@ -39,6 +39,7 @@ export class CreateDirectoryComponent implements OnInit {
       const currentDirectoryPath = `${
         this.authService.getUserInformation().username
       }/${this.driveService.getCurrentPath().join('/')}`;
+      // Create directory
       await this.directoryService.createDirectory(
         this.directoryName,
         currentDirectoryPath,

@@ -57,22 +57,6 @@ export class DriveComponent implements OnInit {
   }
 
   /**
-   * Opens the dialog for creating a new directory
-   */
-  public openCreateDirectoryDialog(): void {
-    const createDirectoryDialog = this.dialog.open(CreateDirectoryComponent, {
-      width: '500px',
-    });
-    createDirectoryDialog
-      .afterClosed()
-      .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
-        if (shouldDirectoriesGetRefreshed) {
-          await this.getDir(this.getCurrentPath());
-        }
-      });
-  }
-
-  /**
    *
    * @returns used percentage
    */
@@ -91,6 +75,7 @@ export class DriveComponent implements OnInit {
     this.user.password = '';
     this.user.username = '';
     this.authenticationService.setUserInformation(this.user);
+    this.driveService.setCurrentPath([]);
     this.routerService.navigateByUrl('/');
   }
 
@@ -176,5 +161,21 @@ export class DriveComponent implements OnInit {
         duration: 3000,
       });
     }
+  }
+
+  /**
+   * Opens the dialog for creating a new directory
+   */
+  public openCreateDirectoryDialog(): void {
+    const createDirectoryDialog = this.dialog.open(CreateDirectoryComponent, {
+      width: '500px',
+    });
+    createDirectoryDialog
+      .afterClosed()
+      .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
+        if (shouldDirectoriesGetRefreshed) {
+          await this.getDir(this.getCurrentPath());
+        }
+      });
   }
 }
