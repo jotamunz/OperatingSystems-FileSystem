@@ -61,4 +61,4 @@ def getUsers():
     currentDir = os.path.dirname(__file__)
     drivesDir = os.path.join(currentDir, '..', 'Drives')
     users = getContentNamesFisical(drivesDir)
-    return {users}
+    return {"users": users}

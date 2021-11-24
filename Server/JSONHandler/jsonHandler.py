@@ -51,7 +51,7 @@ def getContentNamesFisical(directory):
         if os.path.isfile(file):
             base = os.path.basename(file)
             fileName = os.path.splitext(base)[0]
-            names += fileName
+            names.append(fileName)
     return names
 
 def homeDirectory(username):

@@ -2,7 +2,7 @@
 from HTTPServer import app
 from flask import request, jsonify, make_response
 from flask_expects_json import expects_json
-from JSONHandler.loginHandler import createDrive, login, driveIsUnique, getSpace
+from JSONHandler.loginHandler import createDrive, login, driveIsUnique, getSpace, getUsers
 
 # Request schemas
 post_drive_req_schema = {
@@ -99,8 +99,7 @@ def get_drive():
     """
     response:
     {
-        username: [String],
+        users: [String],
     }
     """
-
-    return make_response(jsonify(resp), 200)
+    return make_response(jsonify(getUsers()), 200)
