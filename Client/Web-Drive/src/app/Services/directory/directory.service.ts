@@ -14,7 +14,7 @@ export class DirectoryService {
 
    /**
    * Retrieves from server directories data
-   * @param dirData The retrieved info
+   * @param path To the dir
    * @returns The response from the API
    */
 

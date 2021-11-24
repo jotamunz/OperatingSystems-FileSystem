@@ -3,7 +3,11 @@ import { Router } from '@angular/router';
 import { AuthenticationService } from '../../Services/authentication/authentication.service';
 import { DirectoryService } from '../../Services/directory/directory.service';
 import { DriveService } from '../../Services/drive/drive.service';
+import { FileService } from '../../Services/file/file.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { FileViewComponent } from '../file-view/file-view.component';
+
 import Drive from '../../Models/drive.model';
 import Directory from '../../Models/directory.model';
 import File from '../../Models/file.model';
@@ -28,10 +32,12 @@ export class DriveComponent implements OnInit {
 
 
   constructor(
+    private dialog: MatDialog,
     private routerService: Router,
     private authenticationService: AuthenticationService,
     private dirService : DirectoryService,
     private driveService : DriveService,
+    private fileService : FileService,
     private snackBar: MatSnackBar
     ) {}
 
@@ -44,7 +50,12 @@ export class DriveComponent implements OnInit {
     } 
   }
 
-
+  /**
+   * Opens the signup dialog
+   */
+   public openDialog(): void {
+    this.dialog.open(FileViewComponent);
+  }
 
   /**
    * 
@@ -87,11 +98,21 @@ export class DriveComponent implements OnInit {
    * @returns void
    */
  public async getSpace(username:string){
-  if(this.user.username != null){
-    this.space = await this.driveService.getDriveSpace(this.user.username);
-  } 
-}
+    if(this.user.username != null){
+      this.space = await this.driveService.getDriveSpace(this.user.username);
+    } 
+  }
 
+/**
+   * Gets current space for the drive
+   * @returns void
+   */
+ public async getFile(filename:any){
+    let file = await this.fileService.getFile(this.getCurrentPath(),filename);
+    console.log(file);
+    this.openDialog();
+    return file;
+}
 
   /**
    * Change Dir to selected Dir
