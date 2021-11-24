@@ -7,7 +7,7 @@ from JSONHandler.fileHandler import *
 if __name__ == '__main__':
     #app.run(host="0.0.0.0", port=8000, debug=False)
     #createDrive("Soap", "123", 100)
-    shareFile("Roo/root/xd/lmao", "FILE", "Soap")
+    pass
 
 
 
