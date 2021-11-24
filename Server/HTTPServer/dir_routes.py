@@ -1,7 +1,8 @@
 # Imports
 from HTTPServer import app
 from flask import request, jsonify, make_response
-from JSONHandler.fileHandler import getDirContent, createDir, dirIsUnique, deleteDir
+from JSONHandler.fileHandler import getDirContent, createDir, dirIsUnique, deleteDir, moveDir, spaceAvailableShareDir, \
+    shareDir
 from flask_expects_json import expects_json
 
 post_dir_req_schema = {
@@ -18,23 +19,12 @@ delete_dir_req_schema = {
     "type": "object",
     "properties": {
         "dirPath": {"type": "string"},
-        "dirName": {"type": "string"},
+        "dirName": {"type": "string"}
     },
     "required": ["dirPath", "dirName"]
 }
 
-share_dir_req_schema = {
-    "type": "object",
-    "properties": {
-        "sourceUsername": {"type": "string"},
-        "dirPath": {"type": "string"},
-        "dirName": {"type": "string"},
-        "destinyUsername": {"type": "string"}
-    },
-    "required": ["sourceUsername", "dirPath", "dirName", "destinyUsername"]
-}
-
-put_dir_req_schema = {
+post_move_dir_req_schema = {
     "type": "object",
     "properties": {
         "dirPath": {"type": "string"},
@@ -42,7 +32,18 @@ put_dir_req_schema = {
         "destinyPath": {"type": "string"},
         "forceOverwrite": {"type": "boolean"}
     },
-    "required": ["dirPath", "dirName", "destinyPath", "destinyUsername"]
+    "required": ["dirPath", "dirName", "destinyPath", "forceOverwrite"]
+}
+
+post_share_dir_req_schema = {
+    "type": "object",
+    "properties": {
+        "dirPath": {"type": "string"},
+        "dirName": {"type": "string"},
+        "destinyUsername": {"type": "string"},
+        "forceOverwrite": {"type": "boolean"}
+    },
+    "required": ["dirPath", "dirName", "destinyUsername", "forceOverwrite"]
 }
 
 
@@ -51,6 +52,8 @@ put_dir_req_schema = {
 @app.route('/dirs', methods=['GET'])
 def get_dir():
     """
+    Params:
+        dirPath
     response:
     {
         "username": String,
@@ -59,7 +62,7 @@ def get_dir():
                 {
                     "name": String,
                     "directories": Array,
-                    "files": String
+                    "files": Array
                 }
             ]
             "files" [
@@ -95,7 +98,7 @@ def post_dir():
     response:
     {
         "dirName": String,
-        "path": String,
+        "dirPath": String,
         "requestOverwrite": Boolean
     }
     """
@@ -107,11 +110,11 @@ def post_dir():
     if not status:
         error = {"message": "The given directory name is invalid, please try another", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
-    resp = {"dirName": content["dirName"], "path": content["newDirPath"], "requestOverwrite": False}
+    resp = {"dirName": content["dirName"], "dirPath": content["newDirPath"], "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
 
 
-# Route to delete an existing file
+# Route to delete an existing directory
 @app.route('/dirs', methods=['DELETE'])
 @expects_json(delete_dir_req_schema)
 def delete_dir():
@@ -131,39 +134,56 @@ def delete_dir():
     return make_response(jsonify(resp), 200)
 
 
-# Route to share a file with another user
+# Route to move a directory
+@app.route('/dirs/move', methods=['POST'])
+@expects_json(post_move_dir_req_schema)
+def move_dir():
+    """
+    response:
+    {
+        "dirName": String,
+        "dirPath": String,
+        "requestOverwrite": String
+    }
+    """
+    content = request.json
+    if not dirIsUnique(content["dirPath"], content["dirName"]) and not content["forceOverwrite"]:
+        error = {"message": "Another directory already exists at the shared directory of the target user",
+                 "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    status = moveDir(content["dirPath"], content["dirName"], content["destinyPath"])
+    if not status:
+        error = {"message": "The directory could not be moved", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"dirName": content["fileName"], "dirPath": content["filePath"], "requestOverwrite": False}
+    return make_response(jsonify(resp), 200)
+
+
+# Route to share a directory with another user
 @app.route('/dirs/share', methods=['POST'])
-@expects_json(share_dir_req_schema)
+@expects_json(post_share_dir_req_schema)
 def share_dir():
     """
     response:
     {
         "sourceUsername": String
         "destinyUsername": String,
-        "sharedDireName": String
-
+        "sharedDirName": String
     }
     """
     content = request.json
-    resp = {"sourceUsername": content["sourceUsername"], "destinyUsername": content["destinyUsername"],
-            "sharedDireName": content["dirPath"]}
-    return make_response(jsonify(resp), 200)
-
-
-# Route to move a directory
-@app.route('/dirs', methods=['PUT'])
-@expects_json(put_dir_req_schema)
-def move_dir():
-    """
-    response:
-    {
-        "sourceUsername": String
-        "destinyUsername": String,
-        "sharedDireName": String
-
-    }
-    """
-    content = request.json
-    resp = {"sourceUsername": content["sourceUsername"], "destinyUsername": content["destinyUsername"],
-            "sharedDireName": content["dirPath"]}
+    if not dirIsUnique(content["destinyUsername"] + "/shared", content["dirName"]) and not content["forceOverwrite"]:
+        error = {"message": "Another directory already exists at the shared folder of target user",
+                 "requestOverwrite": True}
+        return make_response(jsonify(error), 409)
+    if not spaceAvailableShareDir(content["destinyUsername"], content["dirPath"], content["dirName"]):
+        error = {"message": "Sufficient space isn't available in target user shared directory",
+                 "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    status = shareDir(content["dirPath"], content["dirName"], content["destinyUsername"])
+    if not status:
+        error = {"message": "The directory could not be shared", "requestOverwrite": False}
+        return make_response(jsonify(error), 409)
+    resp = {"destinyUsername": content["destinyUsername"], "sharedFileName": content["dirName"],
+            "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
