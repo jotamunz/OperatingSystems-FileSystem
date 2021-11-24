@@ -62,7 +62,7 @@ def get_dir():
                 {
                     "name": String,
                     "directories": Array,
-                    "files": String
+                    "files": Array
                 }
             ]
             "files" [
