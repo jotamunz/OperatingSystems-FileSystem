@@ -53,8 +53,16 @@ export class UploadFileComponent implements OnInit {
       });
       this.dialogRef.close(true);
     } catch (error: any) {
-      console.log(error.error);
+      const { requestOverrite } = error.error;
+      if (!requestOverrite) {
+        this.snackBar.open('Not enough space', 'Close', {
+          verticalPosition: 'top',
+          duration: 3000,
+        });
+        return;
+      }
       this.isNameRepeated = true;
+      console.log(error.error);
     }
   }
 
