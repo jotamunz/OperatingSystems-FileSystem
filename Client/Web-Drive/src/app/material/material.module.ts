@@ -8,7 +8,9 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatListModule } from '@angular/material/list'
+import { MatListModule } from '@angular/material/list';
+import { MatMenuTrigger } from '@angular/material/menu';
+
 
 
 const MaterialComponents = [
@@ -23,11 +25,12 @@ const MaterialComponents = [
   MatCardModule,
   MatMenuModule,
   MatListModule,
+  
 ];
 
 @NgModule({
   imports: [MaterialComponents],
   exports: [MaterialComponents],
-  providers: [{ provide: MatDialogRef, useValue: {} }],
+  providers: [{ provide: MatDialogRef, useValue: {} },MatMenuTrigger],
 })
 export class MaterialModule {}
