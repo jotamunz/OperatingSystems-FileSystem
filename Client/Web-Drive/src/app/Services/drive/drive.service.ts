@@ -23,6 +23,12 @@ export class DriveService {
     );
   }
 
+  public getUsers(): Promise<any> {
+    return lastValueFrom(
+      this.httpClient.get('/api/drives')
+    );
+  }
+
   public getCurrentPath(): string[] {
     return this.currentPath;
   }
