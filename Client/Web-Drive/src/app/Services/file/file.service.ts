@@ -4,25 +4,40 @@ import { lastValueFrom } from 'rxjs';
 
 import File from '../../Models/file.model';
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FileService {
-
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient) {}
 
   /**
-   * Retrieves from server file data
-   * @param path To the file
-   * @returns The response from the API
+   * Creates a new file
+   * @param fileData The data of the new file
+   * @returns The information of the new file
    */
+  public createFile(fileData: {
+    filePath: string;
+    extension: string;
+    newFileName: string;
+    content: string;
+    forceOverwrite: boolean;
+  }): Promise<any> {
+    return lastValueFrom(this.httpClient.post<any>('/api/files', fileData));
+  }
 
- public getFile(path: string,fileName: string): Promise<any>{
-  return lastValueFrom(this.httpClient.get('/api/files?filePath='+path+'&fileName='+fileName+'&contentOnly=false'));
-}
+  public getFile(path: string, fileName: string): Promise<any> {
+    return lastValueFrom(
+      this.httpClient.get(
+        '/api/files?filePath=' +
+          path +
+          '&fileName=' +
+          fileName +
+          '&contentOnly=false'
+      )
+    );
+  }
 
-public modifyFile(file: any): Promise<any>{
-  return lastValueFrom(this.httpClient.post('/api/files/modify',file));
-}
+  public modifyFile(file: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/files/modify', file));
+  }
 }
