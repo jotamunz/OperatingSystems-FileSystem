@@ -87,7 +87,6 @@ def get_dir():
             }
             ]
         ]
-    contents is empty in case of error
     }
     """
     dir_path = request.args.get('dirPath')

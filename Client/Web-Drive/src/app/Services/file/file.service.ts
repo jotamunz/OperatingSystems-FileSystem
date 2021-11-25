@@ -11,23 +11,6 @@ export class FileService {
   constructor(private httpClient: HttpClient) {}
 
   /**
-   * Retrieves from server file data
-   * @param path To the file
-   * @returns The response from the API
-   */
-  public getFile(path: string, fileName: string): Promise<any> {
-    return lastValueFrom(
-      this.httpClient.get<any>(
-        '/api/files?filePath=' +
-          path +
-          '&fileName=' +
-          fileName +
-          '&contentOnly=false'
-      )
-    );
-  }
-
-  /**
    * Creates a new file
    * @param fileData The data of the new file
    * @returns The information of the new file
@@ -40,5 +23,21 @@ export class FileService {
     forceOverwrite: boolean;
   }): Promise<any> {
     return lastValueFrom(this.httpClient.post<any>('/api/files', fileData));
+  }
+
+  public getFile(path: string, fileName: string): Promise<any> {
+    return lastValueFrom(
+      this.httpClient.get(
+        '/api/files?filePath=' +
+          path +
+          '&fileName=' +
+          fileName +
+          '&contentOnly=false'
+      )
+    );
+  }
+
+  public modifyFile(file: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/files/modify', file));
   }
 }
