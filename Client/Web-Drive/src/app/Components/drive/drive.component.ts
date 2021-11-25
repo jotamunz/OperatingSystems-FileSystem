@@ -9,13 +9,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FileViewComponent } from '../file-view/file-view.component';
 import { CreateDirectoryComponent } from '../create-directory/create-directory.component';
+import { CreateFileComponent } from '../create-file/create-file.component';
+import { UploadFileComponent } from '../upload-file/upload-file.component';
 
 import Drive from '../../Models/drive.model';
 import Directory from '../../Models/directory.model';
 import File from '../../Models/file.model';
 import User from '../../Models/user.model';
 import Space from '../../Models/space.model';
-import { CreateFileComponent } from '../create-file/create-file.component';
 
 @Component({
   selector: 'app-drive',
@@ -190,6 +191,23 @@ export class DriveComponent implements OnInit {
         width: '600px',
       });
     createFileDialog
+      .afterClosed()
+      .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
+        if (shouldDirectoriesGetRefreshed) {
+          await this.getDir(this.getCurrentPath());
+        }
+      });
+  }
+
+  /**
+   * Opens the dialog for uploading a new file
+   */
+  public openUploadFileDialog(): void {
+    const createUploadFileDialog: MatDialogRef<UploadFileComponent> =
+      this.dialog.open(UploadFileComponent, {
+        width: '600px',
+      });
+    createUploadFileDialog
       .afterClosed()
       .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
         if (shouldDirectoriesGetRefreshed) {

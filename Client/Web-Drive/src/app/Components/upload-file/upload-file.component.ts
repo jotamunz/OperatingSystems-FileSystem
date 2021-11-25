@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
 import { FileService } from '../../Services/file/file.service';
 import { DriveService } from '../../Services/drive/drive.service';
 import { AuthenticationService } from '../../Services/authentication/authentication.service';
@@ -8,48 +7,47 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-create-file',
-  templateUrl: './create-file.component.html',
-  styleUrls: ['./create-file.component.css'],
+  selector: 'app-upload-file',
+  templateUrl: './upload-file.component.html',
+  styleUrls: ['./upload-file.component.css'],
 })
-export class CreateFileComponent implements OnInit {
-  public fileName: string = '';
-  public fileExtension: string = '';
-
-  public fileNameFormControl: FormControl = new FormControl('', [
-    Validators.required,
-  ]);
-  public fileExtensionFormControl: FormControl = new FormControl('', [
-    Validators.required,
-  ]);
-
+export class UploadFileComponent implements OnInit {
   public isNameRepeated: boolean = false;
+  public selectedFile: File | undefined;
 
   constructor(
     private fileService: FileService,
     private driveService: DriveService,
     private authService: AuthenticationService,
     private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<CreateFileComponent>
+    public dialogRef: MatDialogRef<UploadFileComponent>
   ) {}
 
   ngOnInit(): void {}
 
   public async onSubmit(forceOverwrite: boolean = false): Promise<void> {
     try {
-      if (!this.fileName || !this.fileExtension) return;
-      // Build request path
-      const currentDirectoryPath = `${
+      if (!this.selectedFile) return;
+      // Build file path
+      const filePath = `${
         this.authService.getUserInformation().username
       }/${this.driveService.getCurrentPath().join('/')}`;
+      // Get file content
+      const content = await this.selectedFile?.text();
+      // Get file extension
+      const extension =
+        this.selectedFile.name.split('.').length > 1
+          ? this.selectedFile.name.split('.')[1]
+          : '';
+      const newFileName = this.selectedFile.name.split('.')[0];
       await this.fileService.createFile({
-        filePath: currentDirectoryPath,
-        extension: this.fileExtension,
-        newFileName: this.fileName,
-        content: '',
+        filePath,
+        extension,
+        newFileName,
+        content,
         forceOverwrite,
       });
-      this.snackBar.open('File created!', 'Close', {
+      this.snackBar.open('File uploaded!', 'Close', {
         verticalPosition: 'top',
         duration: 3000,
       });
@@ -58,6 +56,10 @@ export class CreateFileComponent implements OnInit {
       console.log(error.error);
       this.isNameRepeated = true;
     }
+  }
+
+  public onFileSelected(event: any): void {
+    this.selectedFile = event.target.files[0];
   }
 
   public closeDialog() {

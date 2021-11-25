@@ -14,9 +14,10 @@ import { DriveComponent } from './Components/drive/drive.component';
 import { FileViewComponent } from './Components/file-view/file-view.component';
 import { CreateDirectoryComponent } from './Components/create-directory/create-directory.component';
 import { CreateFileComponent } from './Components/create-file/create-file.component';
+import { UploadFileComponent } from './Components/upload-file/upload-file.component';
 
 @NgModule({
-  declarations: [AppComponent, LoginComponent, SignUpComponent, DriveComponent, FileViewComponent, CreateDirectoryComponent, CreateFileComponent],
+  declarations: [AppComponent, LoginComponent, SignUpComponent, DriveComponent, FileViewComponent, CreateDirectoryComponent, CreateFileComponent, UploadFileComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
