@@ -127,10 +127,16 @@
               >
                 <mat-icon> share </mat-icon>Share
               </button>
-              <button mat-menu-item (click)="openMoveDialog(directory.name)">
+              <button
+                mat-menu-item
+                (click)="openMoveDialog(directory.name, false)"
+              >
                 <mat-icon>drive_file_move</mat-icon> Move
               </button>
-              <button mat-menu-item (click)="openCopyDialog(directory.name)">
+              <button
+                mat-menu-item
+                (click)="openCopyDialog(directory.name, false)"
+              >
                 <mat-icon>content_copy</mat-icon> Copy
               </button>
             </ng-template>
@@ -172,10 +178,10 @@
               <button mat-menu-item (click)="openShareDialog(file.name, true)">
                 <mat-icon> share </mat-icon>Share
               </button>
-              <button mat-menu-item (click)="openMoveDialog(file.name)">
+              <button mat-menu-item (click)="openMoveDialog(file.name, true)">
                 <mat-icon>drive_file_move</mat-icon> Move
               </button>
-              <button mat-menu-item (click)="openCopyDialog(file.name)">
+              <button mat-menu-item (click)="openCopyDialog(file.name, true)">
                 <mat-icon>content_copy</mat-icon> Copy
               </button>
             </ng-template>

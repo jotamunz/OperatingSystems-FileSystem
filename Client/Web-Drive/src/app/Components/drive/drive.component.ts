@@ -214,8 +214,9 @@ export class DriveComponent implements OnInit {
    * Opens Move Dialog
    * @returns void
    */
-  public openMoveDialog(filename:any){
+  public openMoveDialog(filename:any,type:boolean){
     let dialogRef = this.dialog.open(MoveComponent);
+    dialogRef.componentInstance.type = type;
     dialogRef.componentInstance.move = true;
     dialogRef.componentInstance.user = this.user;
     dialogRef.componentInstance.file = filename;
@@ -227,8 +228,9 @@ export class DriveComponent implements OnInit {
    * Opens Copy Dialog
    * @returns void
    */
-    public openCopyDialog(filename:any){
+    public openCopyDialog(filename:any,type:boolean){
       let dialogRef = this.dialog.open(MoveComponent);
+      dialogRef.componentInstance.type = type;
       dialogRef.componentInstance.move = false;
       dialogRef.componentInstance.user = this.user;
       dialogRef.componentInstance.file = filename;

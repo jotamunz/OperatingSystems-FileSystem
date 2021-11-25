@@ -41,4 +41,12 @@ export class DirectoryService {
   public shareDir(dir: any): Promise<any> {
     return lastValueFrom(this.httpClient.post('/api/dirs/share', dir));
   }
+
+  public moveDir(dir: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/dirs/move', dir));
+  }
+
+  public copyDir(dir: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/dirs/vvcopy', dir));
+  }
 }
