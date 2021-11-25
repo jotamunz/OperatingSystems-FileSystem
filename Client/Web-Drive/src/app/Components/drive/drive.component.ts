@@ -199,12 +199,14 @@ export class DriveComponent implements OnInit {
 
    /**
    * Open share dialog
+   * true for sharing files and false for sharing directories
    * @returns void
    */
-   public async openShareDialog(filename:any){
+   public async openShareDialog(filename:any,type:boolean){
     let dialogRef = this.dialog.open(ShareComponent);
     dialogRef.componentInstance.fileName = filename;
     dialogRef.componentInstance.filePath = this.getCurrentPath();
+    dialogRef.componentInstance.type = type;
    }
 
 

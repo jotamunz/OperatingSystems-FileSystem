@@ -37,4 +37,8 @@ export class DirectoryService {
   deleteDir(dir: { dirPath: string; dirName: any; }) {
     return lastValueFrom(this.httpClient.delete('/api/dirs',{"body":dir,"headers":{"Content-Type":"application/json"}}));
   }
+
+  public shareDir(dir: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/dirs/share', dir));
+  }
 }
