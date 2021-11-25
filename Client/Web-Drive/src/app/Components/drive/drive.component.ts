@@ -4,19 +4,22 @@ import { AuthenticationService } from '../../Services/authentication/authenticat
 import { DirectoryService } from '../../Services/directory/directory.service';
 import { DriveService } from '../../Services/drive/drive.service';
 import { FileService } from '../../Services/file/file.service';
-
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FileViewComponent } from '../file-view/file-view.component';
 import { CreateDirectoryComponent } from '../create-directory/create-directory.component';
 import { CreateFileComponent } from '../create-file/create-file.component';
 import { UploadFileComponent } from '../upload-file/upload-file.component';
+import { saveAs } from 'file-saver';
+
 
 import Drive from '../../Models/drive.model';
 import Directory from '../../Models/directory.model';
 import File from '../../Models/file.model';
 import User from '../../Models/user.model';
 import Space from '../../Models/space.model';
+
+declare const FileSaver:any;
 
 @Component({
   selector: 'app-drive',
@@ -38,7 +41,7 @@ export class DriveComponent implements OnInit {
     private dirService: DirectoryService,
     private driveService: DriveService,
     private fileService: FileService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -107,12 +110,55 @@ export class DriveComponent implements OnInit {
   }
 
   /**
-   * Gets current space for the drive
+   * Gets selected file
    * @returns void
    */
   public async getFile(filename: any) {
     let file = await this.fileService.getFile(this.getCurrentPath(), filename);
     this.openDialog(file);
+  }
+
+  /**
+   * Download file
+   * @returns void
+   */
+   public async downloadFile(filename: any) {
+    
+    let file : File = await this.fileService.getFile(this.getCurrentPath(), filename);
+    if (file.content != undefined){
+      let blob = new Blob([file.content],{type:"text/plain;charset=utf-8"});
+      saveAs(blob,file.name);
+    }
+    
+
+   } 
+
+  /**
+   * Deletes selected file
+   * @returns void
+   */
+  public async removeFile(filename: any){
+    
+    try {
+      let file = {"filePath": this.getCurrentPath(),
+                          "fileName": filename,
+                        };
+        await this.fileService.deleteFile(file);
+        this.snackBar.open("File deleted successfully", 'Close', {
+          verticalPosition: 'top',
+          duration: 3000,
+        });
+
+        this.getDir(this.getCurrentPath());
+  
+      } catch (err: any) {
+        console.log(err.error);
+        const { message } = err.error;
+        this.snackBar.open(message, 'Close', {
+          verticalPosition: 'top',
+          duration: 3000,
+        });
+      }
   }
 
   /**
