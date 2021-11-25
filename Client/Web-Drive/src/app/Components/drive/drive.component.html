@@ -146,8 +146,10 @@
               <button mat-menu-item (click)="removeFile(file.name)">
                 <mat-icon> delete </mat-icon>Delete
               </button>
-              <button mat-menu-item><mat-icon> share </mat-icon>Share</button>
-              <button mat-menu-item>
+              <button mat-menu-item (click)="openShareDialog()">
+                <mat-icon> share </mat-icon>Share
+              </button>
+              <button mat-menu-item (click)="openMoveDialog(file.name)">
                 <mat-icon>drive_file_move</mat-icon> Move
               </button>
               <button mat-menu-item>

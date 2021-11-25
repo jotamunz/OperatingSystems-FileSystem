@@ -11,6 +11,7 @@ import { CreateDirectoryComponent } from '../create-directory/create-directory.c
 import { CreateFileComponent } from '../create-file/create-file.component';
 import { UploadFileComponent } from '../upload-file/upload-file.component';
 import { saveAs } from 'file-saver';
+import { ShareComponent } from '../share/share.component';
 
 
 import Drive from '../../Models/drive.model';
@@ -18,6 +19,7 @@ import Directory from '../../Models/directory.model';
 import File from '../../Models/file.model';
 import User from '../../Models/user.model';
 import Space from '../../Models/space.model';
+import { MoveComponent } from '../move/move.component';
 
 declare const FileSaver:any;
 
@@ -55,7 +57,7 @@ export class DriveComponent implements OnInit {
   }
 
   /**
-   * Opens the signup dialog
+   * Opens the fileView Dialog
    */
   public openDialog(file: File): void {
     let dialogRef = this.dialog.open(FileViewComponent);
@@ -132,6 +134,36 @@ export class DriveComponent implements OnInit {
     
 
    } 
+
+   /**
+   * Open share dialog
+   * @returns void
+   */
+   public async openShareDialog(){
+    let dialogRef = this.dialog.open(ShareComponent);
+    this.getUsers();
+
+   }
+
+/**
+   * get users
+   * @returns void
+   */
+   public async getUsers():Promise<void> {
+  
+  }
+
+  /**
+   * Opens Move Dialog
+   * @returns void
+   */
+  public openMoveDialog(filename:any){
+    let dialogRef = this.dialog.open(MoveComponent);
+    dialogRef.componentInstance.user = this.user;
+    dialogRef.componentInstance.file = filename;
+    dialogRef.componentInstance.filePath = this.getCurrentPath();
+    this.getDir(this.getCurrentPath());
+  }
 
   /**
    * Deletes selected file
@@ -263,3 +295,4 @@ export class DriveComponent implements OnInit {
       });
   }
 }
+

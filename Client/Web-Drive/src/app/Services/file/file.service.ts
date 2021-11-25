@@ -44,4 +44,8 @@ export class FileService {
   public deleteFile(file: any): Promise<any> {
     return lastValueFrom(this.httpClient.delete('/api/files',{"body":file,"headers":{"Content-Type":"application/json"}}));
   }
+
+  public moveFile(file: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/files/move', file));
+  }
 }
