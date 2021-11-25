@@ -24,6 +24,7 @@ export class MoveComponent implements OnInit {
   directory: Drive = {};
   file: string = "{}";
   filePath: string = "{}";
+  move:boolean = true;
 
   drives = [1,2,3,4]
   constructor(
@@ -94,6 +95,26 @@ export class MoveComponent implements OnInit {
       try {
         await this.fileService.moveFile(file);
         this.snackBar.open("File moved successfully", 'Close', {
+          verticalPosition: 'top',
+          duration: 3000,
+        });
+        
+      } catch (err: any) {
+        console.log(err.error);
+        const { message } = err.error;
+        this.snackBar.open(message, 'Close', {
+          verticalPosition: 'top',
+          duration: 3000,
+        });
+      }
+    }
+    
+
+    public async OnClickCopy(): Promise<void>{
+      let file = {fileName: this.file,filePath: this.filePath,destinyPath:this.getCurrentPath(),forceOverwrite:true}
+      try {
+        await this.fileService.copyFile(file);
+        this.snackBar.open("File copied successfully", 'Close', {
           verticalPosition: 'top',
           duration: 3000,
         });

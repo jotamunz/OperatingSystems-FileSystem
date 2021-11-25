@@ -126,12 +126,11 @@ export class DriveComponent implements OnInit {
    */
    public async downloadFile(filename: any) {
     
-    let file : File = await this.fileService.getFile(this.getCurrentPath(), filename);
-    if (file.content != undefined){
-      let blob = new Blob([file.content],{type:"text/plain;charset=utf-8"});
-      saveAs(blob,file.name);
-    }
-    
+      let file : File = await this.fileService.getFile(this.getCurrentPath(), filename);
+      if (file.content != undefined){
+        let blob = new Blob([file.content],{type:"text/plain;charset=utf-8"});
+        saveAs(blob,file.name);
+      }
 
    } 
 
@@ -159,11 +158,25 @@ export class DriveComponent implements OnInit {
    */
   public openMoveDialog(filename:any){
     let dialogRef = this.dialog.open(MoveComponent);
+    dialogRef.componentInstance.move = true;
     dialogRef.componentInstance.user = this.user;
     dialogRef.componentInstance.file = filename;
     dialogRef.componentInstance.filePath = this.getCurrentPath();
     this.getDir(this.getCurrentPath());
   }
+
+   /**
+   * Opens Copy Dialog
+   * @returns void
+   */
+    public openCopyDialog(filename:any){
+      let dialogRef = this.dialog.open(MoveComponent);
+      dialogRef.componentInstance.move = false;
+      dialogRef.componentInstance.user = this.user;
+      dialogRef.componentInstance.file = filename;
+      dialogRef.componentInstance.filePath = this.getCurrentPath();
+      this.getDir(this.getCurrentPath());
+    }
 
   /**
    * Deletes selected file
