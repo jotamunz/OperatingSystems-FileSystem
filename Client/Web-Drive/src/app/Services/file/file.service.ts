@@ -52,4 +52,9 @@ export class FileService {
   public copyFile(file: any): Promise<any> {
     return lastValueFrom(this.httpClient.post('/api/files/vvcopy', file));
   }
+
+  public shareFile(file: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/files/share', file));
+  }
+  
 }
