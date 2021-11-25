@@ -19,8 +19,21 @@
     </div>
   </div>
   <div class="footer">
-    <button mat-raised-button color="primary" (click)="OnClickMove()">
+    <button
+      *ngIf="move"
+      mat-raised-button
+      color="primary"
+      (click)="OnClickMove()"
+    >
       Move Here
+    </button>
+    <button
+      *ngIf="!move"
+      mat-raised-button
+      color="primary"
+      (click)="OnClickCopy()"
+    >
+      Copy Here
     </button>
   </div>
 </div>
