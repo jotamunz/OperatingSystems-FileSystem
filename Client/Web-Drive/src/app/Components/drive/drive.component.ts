@@ -34,6 +34,7 @@ export class DriveComponent implements OnInit {
   directories: Directory[] = [];
   directory: Drive = {};
   user: User = {};
+  users: string[] = [];
   space: Space = {};
 
   constructor(
@@ -138,19 +139,12 @@ export class DriveComponent implements OnInit {
    * Open share dialog
    * @returns void
    */
-   public async openShareDialog(){
+   public async openShareDialog(filename:any){
     let dialogRef = this.dialog.open(ShareComponent);
-    this.getUsers();
-
+    dialogRef.componentInstance.fileName = filename;
+    dialogRef.componentInstance.filePath = this.getCurrentPath();
    }
 
-/**
-   * get users
-   * @returns void
-   */
-   public async getUsers():Promise<void> {
-  
-  }
 
   /**
    * Opens Move Dialog
