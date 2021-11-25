@@ -152,7 +152,7 @@
               <button mat-menu-item (click)="openMoveDialog(file.name)">
                 <mat-icon>drive_file_move</mat-icon> Move
               </button>
-              <button mat-menu-item>
+              <button mat-menu-item (click)="openCopyDialog(file.name)">
                 <mat-icon>content_copy</mat-icon> Copy
               </button>
             </ng-template>

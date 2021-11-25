@@ -48,4 +48,8 @@ export class FileService {
   public moveFile(file: any): Promise<any> {
     return lastValueFrom(this.httpClient.post('/api/files/move', file));
   }
+
+  public copyFile(file: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/files/vvcopy', file));
+  }
 }
