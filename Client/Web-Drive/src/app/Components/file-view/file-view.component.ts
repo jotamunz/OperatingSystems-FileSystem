@@ -44,6 +44,7 @@ export class FileViewComponent implements OnInit {
                         "fileName": this.file.name,
                         "content": this.file.content
                        };
+                       console.log(modifiedFile);
       await this.fileService.modifyFile(modifiedFile);
       this.snackBar.open("File updated correctly", 'Close', {
         verticalPosition: 'top',
