@@ -10,7 +10,7 @@ const routes: Routes = [
   {
     path: 'my-drive',
     component: DriveComponent,
-    //canActivate: [AuthenticationGuard],
+    canActivate: [AuthenticationGuard],
   },
 ];
 
