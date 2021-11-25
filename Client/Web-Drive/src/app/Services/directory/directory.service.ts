@@ -33,4 +33,20 @@ export class DirectoryService {
       this.httpClient.post('/api/dirs', { dirName, newDirPath, forceOverwrite })
     );
   }
+
+  deleteDir(dir: { dirPath: string; dirName: any; }) {
+    return lastValueFrom(this.httpClient.delete('/api/dirs',{"body":dir,"headers":{"Content-Type":"application/json"}}));
+  }
+
+  public shareDir(dir: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/dirs/share', dir));
+  }
+
+  public moveDir(dir: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/dirs/move', dir));
+  }
+
+  public copyDir(dir: any): Promise<any> {
+    return lastValueFrom(this.httpClient.post('/api/dirs/vvcopy', dir));
+  }
 }

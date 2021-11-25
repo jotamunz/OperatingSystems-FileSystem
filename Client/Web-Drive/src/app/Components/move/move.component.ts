@@ -25,6 +25,7 @@ export class MoveComponent implements OnInit {
   file: string = "{}";
   filePath: string = "{}";
   move:boolean = true;
+  type: boolean = true;
 
   drives = [1,2,3,4]
   constructor(
@@ -90,14 +91,32 @@ export class MoveComponent implements OnInit {
       }
     }
 
+    /**
+   * Moves a selected file
+   */
     public async OnClickMove(): Promise<void>{
-      let file = {fileName: this.file,filePath: this.filePath,destinyPath:this.getCurrentPath(),forceOverwrite:true}
+      
       try {
-        await this.fileService.moveFile(file);
-        this.snackBar.open("File moved successfully", 'Close', {
+        if(this.type){
+          let file = {fileName: this.file,filePath: this.filePath,destinyPath:this.getCurrentPath(),forceOverwrite:true}
+          
+          await this.fileService.moveFile(file);
+          this.snackBar.open("File moved successfully", 'Close', {
           verticalPosition: 'top',
           duration: 3000,
-        });
+          });
+        }
+
+        else{
+          let dir = {dirName: this.file,dirPath: this.filePath,destinyPath:this.getCurrentPath(),forceOverwrite:true}
+          
+          await this.dirService.moveDir(dir);
+          this.snackBar.open("Directory moved successfully", 'Close', {
+          verticalPosition: 'top',
+          duration: 3000,
+          });
+        }
+        
         
       } catch (err: any) {
         console.log(err.error);
@@ -109,15 +128,34 @@ export class MoveComponent implements OnInit {
       }
     }
     
-
+    /**
+   * Copies a selected file
+   */
     public async OnClickCopy(): Promise<void>{
-      let file = {fileName: this.file,filePath: this.filePath,destinyPath:this.getCurrentPath(),forceOverwrite:true}
+      
       try {
-        await this.fileService.copyFile(file);
-        this.snackBar.open("File copied successfully", 'Close', {
+
+        if(this.type){
+          
+          let file = {fileName: this.file,filePath: this.filePath,destinyPath:this.getCurrentPath(),forceOverwrite:true}
+          console.log(file);
+          await this.fileService.copyFile(file);
+          this.snackBar.open("File copied successfully", 'Close', {
           verticalPosition: 'top',
           duration: 3000,
-        });
+          });
+        }
+
+        else{
+          let dir = {dirName: this.file,dirPath: this.filePath,destinyPath:this.getCurrentPath(),forceOverwrite:true}
+          console.log(dir);
+          await this.dirService.copyDir(dir);
+          this.snackBar.open("Directory copied successfully", 'Close', {
+          verticalPosition: 'top',
+          duration: 3000,
+          });
+        }
+        
         
       } catch (err: any) {
         console.log(err.error);
