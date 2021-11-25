@@ -44,7 +44,10 @@ export class ShareComponent implements OnInit {
     }
   }
 
-  public async onClickShare(user: any){
+  /**
+   * Shares a selected file
+   */
+  public async onClickShareFile(user: any){
     let file = {fileName: this.fileName,filePath: this.filePath,destinyUsername:user,forceOverwrite:true}
     console.log(file);
     try {

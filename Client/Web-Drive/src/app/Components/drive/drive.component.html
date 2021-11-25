@@ -108,11 +108,30 @@
             mat-flat-button
             class="directory"
             *ngFor="let directory of directories"
-            (click)="onClickChangeDirForward(directory.name)"
+            [matMenuTriggerFor]="menuDirectory"
+            [matMenuTriggerData]="{ directory }"
+            (dblclick)="onClickChangeDirForward(directory.name)"
           >
             <mat-icon> folder </mat-icon>
             <span>{{ directory.name }}</span>
           </button>
+          <!-- Context Menu for Directory Buttons -->
+          <mat-menu #menuDirectory="matMenu">
+            <ng-template matMenuContent let-directory="directory">
+              <button mat-menu-item (click)="removeDirectory(directory.name)">
+                <mat-icon> delete </mat-icon>Delete
+              </button>
+              <button mat-menu-item (click)="openShareDialog(directory.name)">
+                <mat-icon> share </mat-icon>Share
+              </button>
+              <button mat-menu-item (click)="openMoveDialog(directory.name)">
+                <mat-icon>drive_file_move</mat-icon> Move
+              </button>
+              <button mat-menu-item (click)="openCopyDialog(directory.name)">
+                <mat-icon>content_copy</mat-icon> Copy
+              </button>
+            </ng-template>
+          </mat-menu>
         </div>
       </div>
 
@@ -131,6 +150,7 @@
             <mat-icon> article </mat-icon>
             <span>{{ file.name }}</span>
           </button>
+          <!-- Contexte Menu for File Buttons -->
           <mat-menu #menuFile="matMenu">
             <ng-template matMenuContent let-file="file">
               <button mat-menu-item (click)="getFile(file.name)">

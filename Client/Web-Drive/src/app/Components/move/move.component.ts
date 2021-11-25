@@ -90,6 +90,9 @@ export class MoveComponent implements OnInit {
       }
     }
 
+    /**
+   * Moves a selected file
+   */
     public async OnClickMove(): Promise<void>{
       let file = {fileName: this.file,filePath: this.filePath,destinyPath:this.getCurrentPath(),forceOverwrite:true}
       try {
@@ -109,7 +112,9 @@ export class MoveComponent implements OnInit {
       }
     }
     
-
+    /**
+   * Copies a selected file
+   */
     public async OnClickCopy(): Promise<void>{
       let file = {fileName: this.file,filePath: this.filePath,destinyPath:this.getCurrentPath(),forceOverwrite:true}
       try {

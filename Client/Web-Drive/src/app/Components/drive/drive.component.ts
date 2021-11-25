@@ -58,20 +58,10 @@ export class DriveComponent implements OnInit {
   }
 
   /**
-   * Opens the fileView Dialog
-   */
-  public openDialog(file: File): void {
-    let dialogRef = this.dialog.open(FileViewComponent);
-    dialogRef.componentInstance.file = file;
-    dialogRef.componentInstance.path = this.path;
-    dialogRef.componentInstance.user = this.user;
-  }
-
-  /**
    *
    * @returns used percentage
    */
-  public getPercentageValue(usedSpace: any, totalSpace: any) {
+   public getPercentageValue(usedSpace: any, totalSpace: any) {
     let percenatage = (usedSpace * 100) / totalSpace;
 
     return percenatage;
@@ -81,7 +71,7 @@ export class DriveComponent implements OnInit {
    * Ends session
    * @returns void
    */
-  public onClickLogout() {
+   public onClickLogout() {
     this.user.allocatedBytes = 0;
     this.user.password = '';
     this.user.username = '';
@@ -113,14 +103,24 @@ export class DriveComponent implements OnInit {
   }
 
   /**
+   * Opens the fileView Dialog
+   */
+  public openDialog(file: File): void {
+    let dialogRef = this.dialog.open(FileViewComponent);
+    dialogRef.componentInstance.file = file;
+    dialogRef.componentInstance.path = this.path;
+    dialogRef.componentInstance.user = this.user;
+  }
+
+  /**
    * Gets selected file
    * @returns void
    */
-  public async getFile(filename: any) {
+   public async getFile(filename: any) {
     let file = await this.fileService.getFile(this.getCurrentPath(), filename);
     this.openDialog(file);
   }
-
+  
   /**
    * Download file
    * @returns void
@@ -134,6 +134,68 @@ export class DriveComponent implements OnInit {
       }
 
    } 
+
+     /**
+   * Deletes selected file
+   * @returns void
+   */
+  public async removeFile(filename: any){
+    
+    try {
+      let file = {"filePath": this.getCurrentPath(),
+                          "fileName": filename,
+                        };
+        await this.fileService.deleteFile(file);
+        this.snackBar.open("File deleted successfully", 'Close', {
+          verticalPosition: 'top',
+          duration: 3000,
+        });
+
+        this.getDir(this.getCurrentPath());
+  
+      } catch (err: any) {
+        console.log(err.error);
+        const { message } = err.error;
+        this.snackBar.open(message, 'Close', {
+          verticalPosition: 'top',
+          duration: 3000,
+        });
+      }
+  }
+
+    /**
+   * Opens the dialog for creating a new file
+   */
+     public openCreateFileDialog(): void {
+      const createFileDialog: MatDialogRef<CreateFileComponent> =
+        this.dialog.open(CreateFileComponent, {
+          width: '600px',
+        });
+      createFileDialog
+        .afterClosed()
+        .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
+          if (shouldDirectoriesGetRefreshed) {
+            await this.getDir(this.getCurrentPath());
+          }
+        });
+    }
+
+    /**
+   * Opens the dialog for uploading a new file
+   */
+     public openUploadFileDialog(): void {
+      const createUploadFileDialog: MatDialogRef<UploadFileComponent> =
+        this.dialog.open(UploadFileComponent, {
+          width: '600px',
+        });
+      createUploadFileDialog
+        .afterClosed()
+        .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
+          if (shouldDirectoriesGetRefreshed) {
+            await this.getDir(this.getCurrentPath());
+          }
+        });
+    }
 
    /**
    * Open share dialog
@@ -172,33 +234,7 @@ export class DriveComponent implements OnInit {
       this.getDir(this.getCurrentPath());
     }
 
-  /**
-   * Deletes selected file
-   * @returns void
-   */
-  public async removeFile(filename: any){
-    
-    try {
-      let file = {"filePath": this.getCurrentPath(),
-                          "fileName": filename,
-                        };
-        await this.fileService.deleteFile(file);
-        this.snackBar.open("File deleted successfully", 'Close', {
-          verticalPosition: 'top',
-          duration: 3000,
-        });
 
-        this.getDir(this.getCurrentPath());
-  
-      } catch (err: any) {
-        console.log(err.error);
-        const { message } = err.error;
-        this.snackBar.open(message, 'Close', {
-          verticalPosition: 'top',
-          duration: 3000,
-        });
-      }
-  }
 
   /**
    * Change Dir to selected Dir
@@ -268,38 +304,34 @@ export class DriveComponent implements OnInit {
       });
   }
 
-  /**
-   * Opens the dialog for creating a new directory
+    /**
+   * Deletes selected direcotry
+   * @returns void
    */
-  public openCreateFileDialog(): void {
-    const createFileDialog: MatDialogRef<CreateFileComponent> =
-      this.dialog.open(CreateFileComponent, {
-        width: '600px',
-      });
-    createFileDialog
-      .afterClosed()
-      .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
-        if (shouldDirectoriesGetRefreshed) {
-          await this.getDir(this.getCurrentPath());
+     public async removeDirectory(dirName: any){
+    
+      try {
+        let dir = {"dirPath": this.getCurrentPath(),
+                            "dirName": dirName,
+                          };
+          await this.dirService.deleteDir(dir);
+          this.snackBar.open("Directory deleted successfully", 'Close', {
+            verticalPosition: 'top',
+            duration: 3000,
+          });
+  
+          this.getDir(this.getCurrentPath());
+    
+        } catch (err: any) {
+          console.log(err.error);
+          const { message } = err.error;
+          this.snackBar.open(message, 'Close', {
+            verticalPosition: 'top',
+            duration: 3000,
+          });
         }
-      });
-  }
+    }
 
-  /**
-   * Opens the dialog for uploading a new file
-   */
-  public openUploadFileDialog(): void {
-    const createUploadFileDialog: MatDialogRef<UploadFileComponent> =
-      this.dialog.open(UploadFileComponent, {
-        width: '600px',
-      });
-    createUploadFileDialog
-      .afterClosed()
-      .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
-        if (shouldDirectoriesGetRefreshed) {
-          await this.getDir(this.getCurrentPath());
-        }
-      });
-  }
+
 }
 

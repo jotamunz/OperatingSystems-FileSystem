@@ -33,4 +33,8 @@ export class DirectoryService {
       this.httpClient.post('/api/dirs', { dirName, newDirPath, forceOverwrite })
     );
   }
+
+  deleteDir(dir: { dirPath: string; dirName: any; }) {
+    return lastValueFrom(this.httpClient.delete('/api/dirs',{"body":dir,"headers":{"Content-Type":"application/json"}}));
+  }
 }
