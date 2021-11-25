@@ -35,21 +35,20 @@ export class CreateFileComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  public async onSubmit(
-    overwriteDirectoryName: boolean = false
-  ): Promise<void> {
+  public async onSubmit(forceOverwrite: boolean = false): Promise<void> {
     try {
-      if (!this.fileName || this.fileExtension) return;
+      if (!this.fileName || !this.fileExtension) return;
       // Build request path
       const currentDirectoryPath = `${
         this.authService.getUserInformation().username
       }/${this.driveService.getCurrentPath().join('/')}`;
-      // Create directory
-      // await this.directoryService.createDirectory(
-      //   this.directoryName,
-      //   currentDirectoryPath,
-      //   overwriteDirectoryName
-      // );
+      await this.fileService.createFile({
+        filePath: currentDirectoryPath,
+        extension: this.fileExtension,
+        newFileName: this.fileName,
+        content: '',
+        forceOverwrite,
+      });
       this.snackBar.open('File created!', 'Close', {
         verticalPosition: 'top',
         duration: 3000,
