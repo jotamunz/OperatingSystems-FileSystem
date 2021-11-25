@@ -203,13 +203,12 @@ h1 {
 
 .no-files {
   position: absolute;
-  top: 50%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-image: url("https://cdn.dribbble.com/users/1231865/screenshots/11157048/media/bc9427646c632ded563ee076fdc5dfda.jpg?compress=1&resize=1200x900");
   background-size: cover;
   background-position: center center;
-  border-radius: 100px;
   height: 50%;
   width: 50%;
 }
