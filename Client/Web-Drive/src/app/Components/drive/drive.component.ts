@@ -34,7 +34,9 @@ export class DriveComponent implements OnInit {
   directory: Drive = {};
   user: User = {};
   users: string[] = [];
-  space: Space = {};
+  space: Space = { usedSpace: 0, totalSpace: 1 };
+
+  spacePercentage: number = 0;
 
   currentDirectory: string = '';
   directoryClicks: number = 0;
@@ -55,7 +57,7 @@ export class DriveComponent implements OnInit {
       await this.getDir(this.user.username + '/root');
       this.path.push('root');
       this.driveService.appendDirectoryToPath('root');
-      this.getSpace(this.user.username);
+      await this.getSpace(this.user.username);
     }
   }
 
@@ -67,6 +69,10 @@ export class DriveComponent implements OnInit {
     let percenatage = (usedSpace * 100) / totalSpace;
 
     return percenatage;
+  }
+
+  public isInShared(): boolean {
+    return this.path[1] === 'shared';
   }
 
   /**
@@ -101,17 +107,25 @@ export class DriveComponent implements OnInit {
   public async getSpace(username: string) {
     if (this.user.username != null) {
       this.space = await this.driveService.getDriveSpace(this.user.username);
+      this.spacePercentage = this.getPercentageValue(
+        this.space.usedSpace,
+        this.space.totalSpace
+      );
     }
   }
 
   /**
    * Opens the fileView Dialog
    */
-  public openDialog(file: File): void {
+  public async openDialog(file: File): Promise<void> {
     let dialogRef = this.dialog.open(FileViewComponent);
     dialogRef.componentInstance.file = file;
     dialogRef.componentInstance.path = this.path;
     dialogRef.componentInstance.user = this.user;
+
+    dialogRef.afterClosed().subscribe(async () => {
+      await this.getSpace(this.user.username as string);
+    });
   }
 
   /**
@@ -150,8 +164,8 @@ export class DriveComponent implements OnInit {
         verticalPosition: 'top',
         duration: 3000,
       });
-
-      this.getDir(this.getCurrentPath());
+      await this.getDir(this.getCurrentPath());
+      await this.getSpace(this.user.username as string);
     } catch (err: any) {
       console.log(err.error);
       const { message } = err.error;
@@ -175,6 +189,7 @@ export class DriveComponent implements OnInit {
       .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
         if (shouldDirectoriesGetRefreshed) {
           await this.getDir(this.getCurrentPath());
+          await this.getSpace(this.user.username as string);
         }
       });
   }
@@ -192,6 +207,7 @@ export class DriveComponent implements OnInit {
       .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
         if (shouldDirectoriesGetRefreshed) {
           await this.getDir(this.getCurrentPath());
+          await this.getSpace(this.user.username as string);
         }
       });
   }
@@ -212,28 +228,35 @@ export class DriveComponent implements OnInit {
    * Opens Move Dialog
    * @returns void
    */
-  public openMoveDialog(filename: any, type: boolean) {
+  public async openMoveDialog(filename: any, type: boolean) {
     let dialogRef = this.dialog.open(MoveComponent);
     dialogRef.componentInstance.type = type;
     dialogRef.componentInstance.move = true;
     dialogRef.componentInstance.user = this.user;
     dialogRef.componentInstance.file = filename;
     dialogRef.componentInstance.filePath = this.getCurrentPath();
-    this.getDir(this.getCurrentPath());
+
+    dialogRef.afterClosed().subscribe(async () => {
+      await this.getDir(this.getCurrentPath());
+    });
   }
 
   /**
    * Opens Copy Dialog
    * @returns void
    */
-  public openCopyDialog(filename: any, type: boolean) {
+  public async openCopyDialog(filename: any, type: boolean) {
     let dialogRef = this.dialog.open(MoveComponent);
     dialogRef.componentInstance.type = type;
     dialogRef.componentInstance.move = false;
     dialogRef.componentInstance.user = this.user;
     dialogRef.componentInstance.file = filename;
     dialogRef.componentInstance.filePath = this.getCurrentPath();
-    this.getDir(this.getCurrentPath());
+
+    dialogRef.afterClosed().subscribe(async () => {
+      await this.getDir(this.getCurrentPath());
+      await this.getSpace(this.user.username as string);
+    });
   }
 
   /**
@@ -299,8 +322,6 @@ export class DriveComponent implements OnInit {
     }
   }
 
-  public onDirectoryClick(directoryName: string): void {}
-
   /**
    * Opens the dialog for creating a new directory
    */
@@ -314,6 +335,7 @@ export class DriveComponent implements OnInit {
       .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
         if (shouldDirectoriesGetRefreshed) {
           await this.getDir(this.getCurrentPath());
+          await this.getSpace(this.user.username as string);
         }
       });
   }
@@ -331,7 +353,7 @@ export class DriveComponent implements OnInit {
         duration: 3000,
       });
 
-      this.getDir(this.getCurrentPath());
+      await this.getDir(this.getCurrentPath());
     } catch (err: any) {
       console.log(err.error);
       const { message } = err.error;

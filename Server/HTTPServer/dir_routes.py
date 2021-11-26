@@ -165,7 +165,7 @@ def move_dir():
     if not status:
         error = {"message": "The directory could not be moved", "requestOverwrite": False}
         return make_response(jsonify(error), 409)
-    resp = {"dirName": content["fileName"], "dirPath": content["filePath"], "requestOverwrite": False}
+    resp = {"dirName": content["dirName"], "dirPath": content["dirPath"], "requestOverwrite": False}
     return make_response(jsonify(resp), 200)
 
 
