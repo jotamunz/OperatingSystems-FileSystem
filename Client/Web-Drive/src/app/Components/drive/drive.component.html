@@ -110,7 +110,7 @@
             *ngFor="let directory of directories"
             [matMenuTriggerFor]="menuDirectory"
             [matMenuTriggerData]="{ directory }"
-            (dblclick)="onClickChangeDirForward(directory.name)"
+            (click)="onClickChangeDirForward(directory.name)"
           >
             <mat-icon> folder </mat-icon>
             <span>{{ directory.name }}</span>

@@ -13,7 +13,6 @@ import { UploadFileComponent } from '../upload-file/upload-file.component';
 import { saveAs } from 'file-saver';
 import { ShareComponent } from '../share/share.component';
 
-
 import Drive from '../../Models/drive.model';
 import Directory from '../../Models/directory.model';
 import File from '../../Models/file.model';
@@ -21,7 +20,7 @@ import User from '../../Models/user.model';
 import Space from '../../Models/space.model';
 import { MoveComponent } from '../move/move.component';
 
-declare const FileSaver:any;
+declare const FileSaver: any;
 
 @Component({
   selector: 'app-drive',
@@ -37,6 +36,9 @@ export class DriveComponent implements OnInit {
   users: string[] = [];
   space: Space = {};
 
+  currentDirectory: string = '';
+  directoryClicks: number = 0;
+
   constructor(
     private dialog: MatDialog,
     private routerService: Router,
@@ -44,7 +46,7 @@ export class DriveComponent implements OnInit {
     private dirService: DirectoryService,
     private driveService: DriveService,
     private fileService: FileService,
-    private snackBar: MatSnackBar,
+    private snackBar: MatSnackBar
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -61,7 +63,7 @@ export class DriveComponent implements OnInit {
    *
    * @returns used percentage
    */
-   public getPercentageValue(usedSpace: any, totalSpace: any) {
+  public getPercentageValue(usedSpace: any, totalSpace: any) {
     let percenatage = (usedSpace * 100) / totalSpace;
 
     return percenatage;
@@ -71,7 +73,7 @@ export class DriveComponent implements OnInit {
    * Ends session
    * @returns void
    */
-   public onClickLogout() {
+  public onClickLogout() {
     this.user.allocatedBytes = 0;
     this.user.password = '';
     this.user.username = '';
@@ -116,105 +118,101 @@ export class DriveComponent implements OnInit {
    * Gets selected file
    * @returns void
    */
-   public async getFile(filename: any) {
+  public async getFile(filename: any) {
     let file = await this.fileService.getFile(this.getCurrentPath(), filename);
     this.openDialog(file);
   }
-  
+
   /**
    * Download file
    * @returns void
    */
-   public async downloadFile(filename: any) {
-    
-      let file : File = await this.fileService.getFile(this.getCurrentPath(), filename);
-      if (file.content != undefined){
-        let blob = new Blob([file.content],{type:"text/plain;charset=utf-8"});
-        saveAs(blob,file.name);
-      }
+  public async downloadFile(filename: any) {
+    let file: File = await this.fileService.getFile(
+      this.getCurrentPath(),
+      filename
+    );
+    if (file.content != undefined) {
+      let blob = new Blob([file.content], { type: 'text/plain;charset=utf-8' });
+      saveAs(blob, file.name);
+    }
+  }
 
-   } 
-
-     /**
+  /**
    * Deletes selected file
    * @returns void
    */
-  public async removeFile(filename: any){
-    
+  public async removeFile(filename: any) {
     try {
-      let file = {"filePath": this.getCurrentPath(),
-                          "fileName": filename,
-                        };
-        await this.fileService.deleteFile(file);
-        this.snackBar.open("File deleted successfully", 'Close', {
-          verticalPosition: 'top',
-          duration: 3000,
-        });
+      let file = { filePath: this.getCurrentPath(), fileName: filename };
+      await this.fileService.deleteFile(file);
+      this.snackBar.open('File deleted successfully', 'Close', {
+        verticalPosition: 'top',
+        duration: 3000,
+      });
 
-        this.getDir(this.getCurrentPath());
-  
-      } catch (err: any) {
-        console.log(err.error);
-        const { message } = err.error;
-        this.snackBar.open(message, 'Close', {
-          verticalPosition: 'top',
-          duration: 3000,
-        });
-      }
+      this.getDir(this.getCurrentPath());
+    } catch (err: any) {
+      console.log(err.error);
+      const { message } = err.error;
+      this.snackBar.open(message, 'Close', {
+        verticalPosition: 'top',
+        duration: 3000,
+      });
+    }
   }
 
-    /**
+  /**
    * Opens the dialog for creating a new file
    */
-     public openCreateFileDialog(): void {
-      const createFileDialog: MatDialogRef<CreateFileComponent> =
-        this.dialog.open(CreateFileComponent, {
-          width: '600px',
-        });
-      createFileDialog
-        .afterClosed()
-        .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
-          if (shouldDirectoriesGetRefreshed) {
-            await this.getDir(this.getCurrentPath());
-          }
-        });
-    }
+  public openCreateFileDialog(): void {
+    const createFileDialog: MatDialogRef<CreateFileComponent> =
+      this.dialog.open(CreateFileComponent, {
+        width: '600px',
+      });
+    createFileDialog
+      .afterClosed()
+      .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
+        if (shouldDirectoriesGetRefreshed) {
+          await this.getDir(this.getCurrentPath());
+        }
+      });
+  }
 
-    /**
+  /**
    * Opens the dialog for uploading a new file
    */
-     public openUploadFileDialog(): void {
-      const createUploadFileDialog: MatDialogRef<UploadFileComponent> =
-        this.dialog.open(UploadFileComponent, {
-          width: '600px',
-        });
-      createUploadFileDialog
-        .afterClosed()
-        .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
-          if (shouldDirectoriesGetRefreshed) {
-            await this.getDir(this.getCurrentPath());
-          }
-        });
-    }
+  public openUploadFileDialog(): void {
+    const createUploadFileDialog: MatDialogRef<UploadFileComponent> =
+      this.dialog.open(UploadFileComponent, {
+        width: '600px',
+      });
+    createUploadFileDialog
+      .afterClosed()
+      .subscribe(async (shouldDirectoriesGetRefreshed: boolean) => {
+        if (shouldDirectoriesGetRefreshed) {
+          await this.getDir(this.getCurrentPath());
+        }
+      });
+  }
 
-   /**
+  /**
    * Open share dialog
    * true for sharing files and false for sharing directories
    * @returns void
    */
-   public async openShareDialog(filename:any,type:boolean){
+  public async openShareDialog(filename: any, type: boolean) {
     let dialogRef = this.dialog.open(ShareComponent);
     dialogRef.componentInstance.fileName = filename;
     dialogRef.componentInstance.filePath = this.getCurrentPath();
     dialogRef.componentInstance.type = type;
-   }
-
+  }
 
   /**
    * Opens Move Dialog
    * @returns void
    */
-  public openMoveDialog(filename:any,type:boolean){
+  public openMoveDialog(filename: any, type: boolean) {
     let dialogRef = this.dialog.open(MoveComponent);
     dialogRef.componentInstance.type = type;
     dialogRef.componentInstance.move = true;
@@ -224,30 +222,40 @@ export class DriveComponent implements OnInit {
     this.getDir(this.getCurrentPath());
   }
 
-   /**
+  /**
    * Opens Copy Dialog
    * @returns void
    */
-    public openCopyDialog(filename:any,type:boolean){
-      let dialogRef = this.dialog.open(MoveComponent);
-      dialogRef.componentInstance.type = type;
-      dialogRef.componentInstance.move = false;
-      dialogRef.componentInstance.user = this.user;
-      dialogRef.componentInstance.file = filename;
-      dialogRef.componentInstance.filePath = this.getCurrentPath();
-      this.getDir(this.getCurrentPath());
-    }
-
-
+  public openCopyDialog(filename: any, type: boolean) {
+    let dialogRef = this.dialog.open(MoveComponent);
+    dialogRef.componentInstance.type = type;
+    dialogRef.componentInstance.move = false;
+    dialogRef.componentInstance.user = this.user;
+    dialogRef.componentInstance.file = filename;
+    dialogRef.componentInstance.filePath = this.getCurrentPath();
+    this.getDir(this.getCurrentPath());
+  }
 
   /**
    * Change Dir to selected Dir
    * @returns void
    */
   public async onClickChangeDirForward(path: any) {
-    this.path.push(path);
-    this.driveService.appendDirectoryToPath(path);
-    await this.getDir(this.getCurrentPath() + path);
+    if (path === this.currentDirectory && this.directoryClicks === 1) {
+      this.path.push(path);
+      this.driveService.appendDirectoryToPath(path);
+      await this.getDir(this.getCurrentPath() + path);
+
+      this.currentDirectory = '';
+      this.directoryClicks = 0;
+    } else {
+      if (path !== this.currentDirectory) {
+        this.directoryClicks = 1;
+        this.currentDirectory = path;
+      } else {
+        this.directoryClicks++;
+      }
+    }
   }
 
   /**
@@ -291,6 +299,8 @@ export class DriveComponent implements OnInit {
     }
   }
 
+  public onDirectoryClick(directoryName: string): void {}
+
   /**
    * Opens the dialog for creating a new directory
    */
@@ -308,34 +318,27 @@ export class DriveComponent implements OnInit {
       });
   }
 
-    /**
+  /**
    * Deletes selected direcotry
    * @returns void
    */
-     public async removeDirectory(dirName: any){
-    
-      try {
-        let dir = {"dirPath": this.getCurrentPath(),
-                            "dirName": dirName,
-                          };
-          await this.dirService.deleteDir(dir);
-          this.snackBar.open("Directory deleted successfully", 'Close', {
-            verticalPosition: 'top',
-            duration: 3000,
-          });
-  
-          this.getDir(this.getCurrentPath());
-    
-        } catch (err: any) {
-          console.log(err.error);
-          const { message } = err.error;
-          this.snackBar.open(message, 'Close', {
-            verticalPosition: 'top',
-            duration: 3000,
-          });
-        }
+  public async removeDirectory(dirName: any) {
+    try {
+      let dir = { dirPath: this.getCurrentPath(), dirName: dirName };
+      await this.dirService.deleteDir(dir);
+      this.snackBar.open('Directory deleted successfully', 'Close', {
+        verticalPosition: 'top',
+        duration: 3000,
+      });
+
+      this.getDir(this.getCurrentPath());
+    } catch (err: any) {
+      console.log(err.error);
+      const { message } = err.error;
+      this.snackBar.open(message, 'Close', {
+        verticalPosition: 'top',
+        duration: 3000,
+      });
     }
-
-
+  }
 }
-
